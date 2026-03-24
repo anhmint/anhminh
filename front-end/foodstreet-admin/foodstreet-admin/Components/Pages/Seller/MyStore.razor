@@ -3,6 +3,7 @@
 @rendermode InteractiveServer
 @inject StoreService StoreSvc
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 @inject IJSRuntime JS
 @implements IDisposable
 
@@ -22,12 +23,12 @@
 <!-- Filters -->
 <MudPaper Class="pa-4 mb-4" Elevation="1" Style="border-radius:8px">
     <MudGrid AlignItems="AlignItems.Center">
-        <MudItem xs="12" md="4">
+        <MudItem xs="12" md="3">
             <MudTextField @bind-Value="_search" Label="Tìm kiếm..."
                           Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
-                          Variant="Variant.Outlined" dense="true" Immediate="true" />
+                          Variant="Variant.Outlined" dense="true" Immediate="true" Clearable="true" />
         </MudItem>
-        <MudItem xs="12" md="3">
+        <MudItem xs="12" md="2">
             <MudSelect @bind-Value="_filterStatus" Label="Trạng thái" Variant="Variant.Outlined" dense="true">
                 <MudSelectItem Value="@("All")">Tất cả</MudSelectItem>
                 <MudSelectItem Value="@("Active")">Active</MudSelectItem>
@@ -38,13 +39,21 @@
         <MudItem xs="12" md="3">
             <MudSelect @bind-Value="_filterCat" Label="Danh mục" Variant="Variant.Outlined" dense="true">
                 <MudSelectItem Value="@("All")">Tất cả</MudSelectItem>
-                @foreach (var cat in new[]{"Ốc","Hải sản","Cơm","Bún/Phở","Đồ uống"})
+                @foreach (var cat in new[]{"Ốc","Hải sản","Cơm","Bún/Phở","Đồ uống","Ăn vặt","Trà sữa","Cà phê","Quán nhậu","Lẩu/Nướng"})
                 {
                     <MudSelectItem Value="@cat">@cat</MudSelectItem>
                 }
             </MudSelect>
         </MudItem>
         <MudItem xs="12" md="2">
+            <MudSelect @bind-Value="_sortBy" Label="Sắp xếp" Variant="Variant.Outlined" dense="true">
+                <MudSelectItem Value="@("Mới nhất")">Mới nhất</MudSelectItem>
+                <MudSelectItem Value="@("Cũ nhất")">Cũ nhất</MudSelectItem>
+                <MudSelectItem Value="@("Tên A-Z")">Tên A-Z</MudSelectItem>
+                <MudSelectItem Value="@("Tên Z-A")">Tên Z-A</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="2" Class="d-flex align-center justify-end">
             <MudText Typo="Typo.body2" Color="Color.Secondary">
                 <b>@Filtered.Count()</b> gian hàng
             </MudText>
@@ -96,7 +105,7 @@
                     </MudStack>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Size="Size.Small" Color="Color.Primary" Variant="Variant.Text"
+                    <MudButton Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled"
                                StartIcon="@Icons.Material.Filled.Edit" OnClick="@(() => OpenEdit(store))">
                         Chỉnh sửa
                     </MudButton>
@@ -148,7 +157,7 @@
             </MudItem>
             <MudItem xs="12" md="6">
                 <MudSelect @bind-Value="_form.Category" Label="Danh mục *" Variant="Variant.Outlined">
-                    @foreach (var cat in new[]{"Ốc","Hải sản","Cơm","Bún/Phở","Đồ uống"})
+                    @foreach (var cat in new[]{"Ốc","Hải sản","Cơm","Bún/Phở","Đồ uống","Ăn vặt","Trà sữa","Cà phê","Quán nhậu","Lẩu/Nướng"})
                     { <MudSelectItem Value="@cat">@cat</MudSelectItem> }
                 </MudSelect>
             </MudItem>
@@ -208,16 +217,30 @@
 
 @code {
     private bool _loading = true, _showDialog, _saving;
-    private string _search = "", _filterStatus = "All", _filterCat = "All";
+    private string _search = "", _filterStatus = "All", _filterCat = "All", _sortBy = "Mới nhất";
     private List<StoreModel> _stores = new();
     private StoreModel? _editing;
     private StoreModel _form = new();
     private const int CurrentSellerId = 1;
 
-    private IEnumerable<StoreModel> Filtered => _stores.Where(s =>
-        (string.IsNullOrEmpty(_search) || s.Name.Contains(_search, StringComparison.OrdinalIgnoreCase)) &&
-        (_filterStatus == "All" || s.Status == _filterStatus) &&
-        (_filterCat == "All" || s.Category == _filterCat));
+    private IEnumerable<StoreModel> Filtered
+    {
+        get
+        {
+            var query = _stores.Where(s =>
+                (string.IsNullOrEmpty(_search) || s.Name.Contains(_search, StringComparison.OrdinalIgnoreCase)) &&
+                (_filterStatus == "All" || s.Status == _filterStatus) &&
+                (_filterCat == "All" || s.Category == _filterCat));
+
+            return _sortBy switch
+            {
+                "Cũ nhất" => query.OrderBy(s => s.Id),
+                "Tên A-Z" => query.OrderBy(s => s.Name),
+                "Tên Z-A" => query.OrderByDescending(s => s.Name),
+                _ => query.OrderByDescending(s => s.Id),
+            };
+        }
+    }
 
     private Color StatusColor(string s) => s switch
     { "Active" => Color.Success, "Pending" => Color.Warning, _ => Color.Error };
@@ -230,18 +253,34 @@
 
     private async Task DeleteStore(StoreModel s)
     {
-        var ok = await StoreSvc.DeleteStoreAsync(s.Id);
-        if (ok) { _stores.Remove(s); Snackbar.Add("Đã xóa gian hàng!", Severity.Success); }
+        bool? result = await DialogService.ShowMessageBoxAsync(
+            "Xác nhận xóa", 
+            $"Bạn có chắc chắn muốn xóa gian hàng '{s.Name}' không?", 
+            yesText: "Xóa", cancelText: "Hủy");
+
+        if (result == true)
+        {
+            var ok = await StoreSvc.DeleteStoreAsync(s.Id);
+            if (ok) { _stores.Remove(s); Snackbar.Add("Đã xóa gian hàng!", Severity.Success); }
+            else { Snackbar.Add("Lỗi khi xóa gian hàng!", Severity.Error); }
+        }
     }
 
     private DotNetObjectReference<MyStore>? _objRef;
 
     private async Task InitMapAsync()
     {
-        _objRef ??= DotNetObjectReference.Create(this);
-        // Delay a bit to let the DOM render the #pickerMap div
-        await Task.Delay(200);
-        await JS.InvokeVoidAsync("leafletInterop.initPickerMap", "pickerMap", _form.Latitude, _form.Longitude, _objRef);
+        try
+        {
+            _objRef ??= DotNetObjectReference.Create(this);
+            // Delay to let the MudDialog animation finish rendering the #pickerMap div
+            await Task.Delay(400);
+            await JS.InvokeVoidAsync("leafletInterop.initPickerMap", "pickerMap", _form.Latitude, _form.Longitude, _objRef);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing map: {ex.Message}");
+        }
     }
 
     [JSInvokable]
@@ -292,6 +331,8 @@
         }
         _saving = false; CloseDialog();
     }
+
+
 
     private void CloseDialog() { _showDialog = false; }
 
