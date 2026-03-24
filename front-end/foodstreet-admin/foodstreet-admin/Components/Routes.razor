@@ -1,9 +1,6 @@
 @using Microsoft.AspNetCore.Components.Authorization
 
-<MudThemeProvider Theme="@_theme" />
-<MudPopoverProvider />
-<MudDialogProvider FullWidth="true" MaxWidth="MaxWidth.Medium" CloseOnEscapeKey="true" />
-<MudSnackbarProvider />
+
 
 <CascadingAuthenticationState>
     <Router AppAssembly="typeof(Routes).Assembly">
@@ -69,23 +66,3 @@
     </Router>
 </CascadingAuthenticationState>
 
-@code {
-    private MudTheme _theme = new MudTheme()
-    {
-        PaletteLight = new PaletteLight()
-        {
-            Primary        = "#1565C0",
-            PrimaryDarken  = "#003c8f",
-            PrimaryLighten = "#5e92f3",
-            Secondary      = "#6A1B9A",
-            Success        = "#2E7D32",
-            Warning        = "#E65100",
-            Error          = "#B71C1C",
-            Info           = "#01579B",
-            AppbarBackground = "#1565C0",
-            DrawerBackground = "#FAFAFA",
-            Background     = "#F0F2F5",
-            Surface        = "#FFFFFF",
-        }
-    };
-}
