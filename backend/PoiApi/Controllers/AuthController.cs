@@ -71,8 +71,8 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public IActionResult Register(RegisterDto dto)
     {
-        if (dto.Role == RoleConstants.Owner)
-            return BadRequest("Cannot register as OWNER role");
+        //if (dto.Role == RoleConstants.Owner)
+        //    return BadRequest("Cannot register as OWNER role");
 
         if (_context.Users.Any(u => u.Email == dto.Email))
             return BadRequest("Email existed");
