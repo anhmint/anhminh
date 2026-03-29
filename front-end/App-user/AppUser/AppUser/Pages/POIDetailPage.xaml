@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AppUser.Pages.POIDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AppUser.ViewModels"
+    xmlns:models="clr-namespace:AppUser.Models"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="{StaticResource Background}">
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Spacing="0">
+
+                <!-- ── HERO IMAGE ── -->
+                <Grid HeightRequest="300">
+                    <Image Source="{Binding POI.ImageUrl}"
+                           Aspect="AspectFill"
+                           HeightRequest="300"
+                           HorizontalOptions="Fill"/>
+
+                    <!-- Dark gradient overlay -->
+                    <BoxView Color="#60000000"
+                             HorizontalOptions="Fill"
+                             VerticalOptions="Fill"/>
+
+                    <!-- Back button -->
+                    <Border BackgroundColor="#80000000"
+                            StrokeShape="RoundRectangle 22"
+                            StrokeThickness="0"
+                            WidthRequest="44" HeightRequest="44"
+                            HorizontalOptions="Start"
+                            VerticalOptions="Start"
+                            Margin="16,48,0,0">
+                        <Button Text="←"
+                                Command="{Binding GoBackCommand}"
+                                BackgroundColor="Transparent"
+                                TextColor="White"
+                                FontSize="20"
+                                Padding="0"
+                                WidthRequest="44" HeightRequest="44"/>
+                    </Border>
+
+                    <!-- Language toggle -->
+                    <Border BackgroundColor="#80000000"
+                            StrokeShape="RoundRectangle 16"
+                            StrokeThickness="0"
+                            Padding="10,6"
+                            HorizontalOptions="End"
+                            VerticalOptions="Start"
+                            Margin="0,52,16,0">
+                        <Button Text="{Binding CurrentLanguage, StringFormat='🌐 {0}'}"
+                                Command="{Binding ToggleLanguageCommand}"
+                                BackgroundColor="Transparent"
+                                TextColor="White"
+                                FontFamily="PoppinsSemiBold"
+                                FontSize="13"
+                                Padding="0"
+                                HeightRequest="32"/>
+                    </Border>
+
+                    <!-- POI Name on image -->
+                    <VerticalStackLayout VerticalOptions="End"
+                                         HorizontalOptions="Start"
+                                         Padding="20,16">
+                        <Label Text="{Binding DisplayName}"
+                               Style="{StaticResource HeadlineMedium}"
+                               TextColor="White"
+                               LineBreakMode="WordWrap"/>
+                        <HorizontalStackLayout Spacing="6" Margin="0,4,0,0">
+                            <Label Text="📍" FontSize="14" TextColor="White"/>
+                            <Label Text="{Binding POI.Location}"
+                                   Style="{StaticResource BodyMedium}"
+                                   TextColor="#DDFFFFFF"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="1"/>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- ── MAIN CONTENT CARD ── -->
+                <Border BackgroundColor="{StaticResource Surface}"
+                        StrokeShape="RoundRectangle 24,24,0,0"
+                        StrokeThickness="0"
+                        Margin="0,-24,0,0"
+                        Padding="20,24,20,20">
+
+                    <VerticalStackLayout Spacing="20">
+
+                        <!-- ── AUDIO PLAYER PREVIEW ── -->
+                        <Border BackgroundColor="{StaticResource Primary}"
+                                StrokeShape="RoundRectangle 16"
+                                StrokeThickness="0"
+                                Padding="16,14"
+                                IsVisible="{Binding HasAudio}">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                    <Label Text="🎧 Thuyết minh audio"
+                                           Style="{StaticResource TitleMedium}"
+                                           TextColor="White"/>
+                                    <Label Text="{Binding CurrentAudioGuide.Title}"
+                                           Style="{StaticResource BodySmall}"
+                                           TextColor="#DDFFFFFF"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1"/>
+                                    <Label Text="{Binding CurrentAudioGuide.DurationDisplay, StringFormat='⏱️ {0}'}"
+                                           Style="{StaticResource LabelCaption}"
+                                           TextColor="#AAFFFFFF"/>
+                                </VerticalStackLayout>
+
+                                <Button Grid.Column="1"
+                                        Text="▶ Nghe"
+                                        Command="{Binding PlayAudioCommand}"
+                                        BackgroundColor="White"
+                                        TextColor="{StaticResource Primary}"
+                                        FontFamily="PoppinsBold"
+                                        FontSize="14"
+                                        CornerRadius="10"
+                                        HeightRequest="40"
+                                        Padding="14,0"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- No audio state -->
+                        <Border BackgroundColor="{StaticResource SurfaceVariant}"
+                                StrokeShape="RoundRectangle 12"
+                                StrokeThickness="0"
+                                Padding="16,12"
+                                IsVisible="{Binding HasAudio, Converter={StaticResource BoolInverterConverter}}">
+                            <Label Text="🔇 Chưa có audio thuyết minh cho ngôn ngữ này"
+                                   Style="{StaticResource BodySmall}"
+                                   TextColor="{StaticResource TextHint}"
+                                   HorizontalOptions="Center"/>
+                        </Border>
+
+                        <!-- ── DIVIDER ── -->
+                        <BoxView Style="{StaticResource Divider}"/>
+
+                        <!-- ── DESCRIPTION ── -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Giới thiệu"
+                                   Style="{StaticResource HeadlineSmall}"/>
+                            <Label Text="{Binding DisplayDescription}"
+                                   Style="{StaticResource BodyLarge}"
+                                   LineBreakMode="WordWrap"/>
+                        </VerticalStackLayout>
+
+                        <!-- ── DIVIDER ── -->
+                        <BoxView Style="{StaticResource Divider}"/>
+
+                        <!-- ── MENU SECTION ── -->
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="🍽️ Thực đơn"
+                                   Style="{StaticResource HeadlineSmall}"/>
+
+                            <!-- Menu Groups -->
+                            <CollectionView ItemsSource="{Binding POI.Shop.Menus}"
+                                            SelectionMode="None">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:MenuDto">
+                                        <VerticalStackLayout Spacing="8" Margin="0,0,0,16">
+
+                                            <!-- Menu name -->
+                                            <Label Text="{Binding Name}"
+                                                   Style="{StaticResource TitleLarge}"
+                                                   TextColor="{StaticResource Primary}"/>
+
+                                            <!-- Menu Items -->
+                                            <CollectionView ItemsSource="{Binding Items}"
+                                                            SelectionMode="None">
+                                                <CollectionView.ItemTemplate>
+                                                    <DataTemplate x:DataType="models:MenuItemDto">
+                                                        <Border BackgroundColor="{StaticResource Surface}"
+                                                                StrokeShape="RoundRectangle 12"
+                                                                StrokeThickness="1"
+                                                                Stroke="{StaticResource Border}"
+                                                                Padding="14,12"
+                                                                Margin="0,4">
+                                                            <Grid ColumnDefinitions="*,Auto">
+                                                                <VerticalStackLayout Grid.Column="0" Spacing="3">
+                                                                    <Label Text="{Binding Name}"
+                                                                           Style="{StaticResource TitleMedium}"/>
+                                                                    <Label Text="{Binding Description}"
+                                                                           Style="{StaticResource BodySmall}"
+                                                                           LineBreakMode="TailTruncation"
+                                                                           MaxLines="2"/>
+                                                                </VerticalStackLayout>
+                                                                <VerticalStackLayout Grid.Column="1"
+                                                                                     HorizontalOptions="End"
+                                                                                     VerticalOptions="Center">
+                                                                    <Label Text="{Binding PriceDisplay}"
+                                                                           Style="{StaticResource TitleMedium}"
+                                                                           TextColor="{StaticResource Primary}"
+                                                                           HorizontalOptions="End"/>
+                                                                    <Label Text="Còn hàng"
+                                                                           Style="{StaticResource LabelCaption}"
+                                                                           TextColor="{StaticResource Success}"
+                                                                           IsVisible="{Binding IsAvailable}"
+                                                                           HorizontalOptions="End"/>
+                                                                </VerticalStackLayout>
+                                                            </Grid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </CollectionView.ItemTemplate>
+                                            </CollectionView>
+                                        </VerticalStackLayout>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Bottom padding -->
+                <BoxView HeightRequest="32" Color="Transparent"/>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- ── FLOATING PLAY BUTTON ── -->
+        <Button Text="🎧  Nghe thuyết minh ngay"
+                Command="{Binding PlayAudioCommand}"
+                Style="{StaticResource PrimaryButton}"
+                IsVisible="{Binding HasAudio}"
+                HorizontalOptions="Fill"
+                VerticalOptions="End"
+                Margin="20,0,20,24"/>
+    </Grid>
+</ContentPage>

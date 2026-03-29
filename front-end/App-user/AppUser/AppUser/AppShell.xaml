@@ -3,12 +3,46 @@
     x:Class="AppUser.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:AppUser"
-    Title="AppUser">
+    xmlns:pages="clr-namespace:AppUser.Pages"
+    Shell.BackgroundColor="{StaticResource Primary}"
+    Shell.ForegroundColor="White"
+    Shell.TitleColor="White"
+    Shell.UnselectedColor="#AAFFFFFF"
+    Shell.TabBarBackgroundColor="{StaticResource Surface}"
+    Shell.TabBarForegroundColor="{StaticResource Primary}"
+    Shell.TabBarUnselectedColor="{StaticResource TextHint}">
 
+    <!-- ── LOGIN PAGE (no tab bar) ── -->
     <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        x:Name="LoginContent"
+        Route="login"
+        ContentTemplate="{DataTemplate pages:LoginPage}"
+        Shell.TabBarIsVisible="False"/>
+
+    <!-- ── MAIN TABS ── -->
+    <TabBar x:Name="MainTabBar">
+
+        <!-- Tab 1: Home -->
+        <ShellContent
+            Route="home"
+            Title="Trang chủ"
+            Icon="ic_home.png"
+            ContentTemplate="{DataTemplate pages:HomePage}"/>
+
+        <!-- Tab 2: POI List -->
+        <ShellContent
+            Route="poiList"
+            Title="Khám phá"
+            Icon="ic_explore.png"
+            ContentTemplate="{DataTemplate pages:POIListPage}"/>
+
+        <!-- Tab 3: Profile -->
+        <ShellContent
+            Route="profile"
+            Title="Hồ sơ"
+            Icon="ic_profile.png"
+            ContentTemplate="{DataTemplate pages:ProfilePage}"/>
+
+    </TabBar>
 
 </Shell>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AppUser.Pages.POIListPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AppUser.ViewModels"
+    xmlns:models="clr-namespace:AppUser.Models"
+    Title="Điểm ẩm thực"
+    BackgroundColor="{StaticResource Background}">
+
+    <Shell.TitleView>
+        <Label Text="🍽️ Điểm ẩm thực"
+               FontFamily="PoppinsBold"
+               FontSize="18"
+               TextColor="White"
+               VerticalOptions="Center"/>
+    </Shell.TitleView>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- ── SEARCH BAR ── -->
+        <VerticalStackLayout Grid.Row="0"
+                             BackgroundColor="{StaticResource Primary}"
+                             Padding="16,8,16,16">
+            <Border BackgroundColor="White"
+                    StrokeShape="RoundRectangle 14"
+                    StrokeThickness="0"
+                    Padding="14,4">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Label Grid.Column="0" Text="🔍" FontSize="18" VerticalOptions="Center" Margin="0,0,8,0"/>
+                    <Entry Grid.Column="1"
+                           Style="{StaticResource InputEntry}"
+                           Placeholder="Tìm kiếm tên, địa chỉ..."
+                           Text="{Binding SearchQuery}"
+                           ReturnCommand="{Binding SearchCommand}"
+                           ReturnType="Search"/>
+                    <Button Grid.Column="2"
+                            Text="✕"
+                            Command="{Binding RefreshCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource TextHint}"
+                            FontSize="14"
+                            Padding="8,0"
+                            HeightRequest="40"
+                            IsVisible="{Binding SearchQuery, Converter={StaticResource StringNotEmptyConverter}}"/>
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
+
+        <!-- ── CONTENT ── -->
+        <RefreshView Grid.Row="1"
+                     Command="{Binding RefreshCommand}"
+                     IsRefreshing="{Binding IsLoading}"
+                     RefreshColor="{StaticResource Primary}">
+
+            <Grid>
+                <!-- Loading -->
+                <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                   IsVisible="{Binding IsLoading}"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Center"/>
+
+                <!-- Empty State -->
+                <VerticalStackLayout IsVisible="{Binding IsEmpty}"
+                                     VerticalOptions="Center"
+                                     HorizontalOptions="Center"
+                                     Spacing="12">
+                    <Label Text="🔍" FontSize="56" HorizontalOptions="Center"/>
+                    <Label Text="Không tìm thấy kết quả"
+                           Style="{StaticResource TitleMedium}"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Thử tìm kiếm với từ khóa khác"
+                           Style="{StaticResource BodySmall}"
+                           HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+
+                <!-- POI List -->
+                <CollectionView ItemsSource="{Binding FilteredPOIs}"
+                                SelectionMode="None"
+                                IsVisible="{Binding IsEmpty, Converter={StaticResource BoolInverterConverter}}"
+                                Margin="0,4">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="0"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:POIDto">
+                            <Border BackgroundColor="{StaticResource Surface}"
+                                    StrokeShape="RoundRectangle 16"
+                                    StrokeThickness="0"
+                                    Margin="16,6">
+                                <Border.Shadow>
+                                    <Shadow Brush="#10000000" Offset="0,2" Radius="10" Opacity="0.15"/>
+                                </Border.Shadow>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:POIListViewModel}}, Path=NavigateToPOICommand}"
+                                        CommandParameter="{Binding .}"/>
+                                </Border.GestureRecognizers>
+
+                                <Grid RowDefinitions="200,Auto">
+
+                                    <!-- Image -->
+                                    <Image Grid.Row="0"
+                                           Source="{Binding ImageUrl}"
+                                           Aspect="AspectFill"
+                                           HeightRequest="200">
+                                        <Image.Clip>
+                                            <RoundRectangleGeometry CornerRadius="16,16,0,0"
+                                                                    Rect="0,0,10000,200"/>
+                                        </Image.Clip>
+                                    </Image>
+
+                                    <!-- Audio Badge -->
+                                    <Border Grid.Row="0"
+                                            BackgroundColor="#DD2C1A0E"
+                                            StrokeShape="RoundRectangle 8"
+                                            StrokeThickness="0"
+                                            Padding="10,6"
+                                            HorizontalOptions="End"
+                                            VerticalOptions="End"
+                                            Margin="0,0,12,12">
+                                        <HorizontalStackLayout Spacing="5">
+                                            <Label Text="🎧" FontSize="13"/>
+                                            <Label Text="Thuyết minh"
+                                                   Style="{StaticResource LabelCaption}"
+                                                   TextColor="White"/>
+                                        </HorizontalStackLayout>
+                                    </Border>
+
+                                    <!-- Info -->
+                                    <VerticalStackLayout Grid.Row="1" Padding="16,14,16,16" Spacing="6">
+                                        <Label Text="{Binding Shop.Name}"
+                                               Style="{StaticResource HeadlineSmall}"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1"/>
+
+                                        <HorizontalStackLayout Spacing="6">
+                                            <Label Text="📍" FontSize="13" VerticalOptions="Center"/>
+                                            <Label Text="{Binding Location}"
+                                                   Style="{StaticResource BodyMedium}"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1"
+                                                   VerticalOptions="Center"/>
+                                        </HorizontalStackLayout>
+
+                                        <Label Text="{Binding Shop.Description}"
+                                               Style="{StaticResource BodySmall}"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="2"
+                                               Margin="0,4,0,0"/>
+
+                                        <!-- CTA Button -->
+                                        <Border BackgroundColor="{StaticResource SurfaceVariant}"
+                                                StrokeShape="RoundRectangle 10"
+                                                StrokeThickness="0"
+                                                Padding="12,8"
+                                                Margin="0,8,0,0"
+                                                HorizontalOptions="Start">
+                                            <HorizontalStackLayout Spacing="6">
+                                                <Label Text="🎵" FontSize="14"/>
+                                                <Label Text="Nghe thuyết minh"
+                                                       Style="{StaticResource BodySmall}"
+                                                       TextColor="{StaticResource Primary}"
+                                                       FontFamily="PoppinsSemiBold"/>
+                                            </HorizontalStackLayout>
+                                        </Border>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                    <CollectionView.Footer>
+                        <BoxView HeightRequest="20" Color="Transparent"/>
+                    </CollectionView.Footer>
+                </CollectionView>
+            </Grid>
+        </RefreshView>
+    </Grid>
+</ContentPage>

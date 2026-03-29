@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AppUser.Pages.ProfilePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AppUser.ViewModels"
+    xmlns:models="clr-namespace:AppUser.Models"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    Title="Hồ sơ"
+    BackgroundColor="{StaticResource Background}">
+
+    <Shell.TitleView>
+        <Label Text="👤 Hồ sơ của tôi"
+               FontFamily="PoppinsBold"
+               FontSize="18"
+               TextColor="White"
+               VerticalOptions="Center"/>
+    </Shell.TitleView>
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="0">
+
+            <!-- ── PROFILE HEADER ── -->
+            <VerticalStackLayout BackgroundColor="{StaticResource Primary}"
+                                  Padding="24,16,24,40"
+                                  Spacing="12"
+                                  HorizontalOptions="Fill">
+
+                <!-- Avatar -->
+                <Border BackgroundColor="White"
+                        StrokeShape="RoundRectangle 40"
+                        StrokeThickness="3"
+                        Stroke="#40FFFFFF"
+                        WidthRequest="80" HeightRequest="80"
+                        HorizontalOptions="Center">
+                    <Label Text="😋"
+                           FontSize="40"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </Border>
+
+                <!-- User info -->
+                <Label Text="{Binding CurrentUser.Email}"
+                       Style="{StaticResource TitleLarge}"
+                       TextColor="White"
+                       HorizontalOptions="Center"/>
+
+                <Border BackgroundColor="#25FFFFFF"
+                        StrokeShape="RoundRectangle 12"
+                        StrokeThickness="0"
+                        Padding="12,6"
+                        HorizontalOptions="Center">
+                    <Label Text="🧑‍🍳 Thám tử ẩm thực"
+                           Style="{StaticResource BodySmall}"
+                           TextColor="White"/>
+                </Border>
+
+                <!-- Stats row -->
+                <Grid ColumnDefinitions="*,*"
+                      HorizontalOptions="Fill"
+                      Margin="0,8,0,0">
+                    <Border Grid.Column="0"
+                            BackgroundColor="#25FFFFFF"
+                            StrokeShape="RoundRectangle 12"
+                            StrokeThickness="0"
+                            Padding="12,10"
+                            Margin="0,0,6,0">
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="{Binding TotalListened}"
+                                   Style="{StaticResource HeadlineMedium}"
+                                   TextColor="White"
+                                   HorizontalOptions="Center"/>
+                            <Label Text="Điểm đã khám phá"
+                                   Style="{StaticResource LabelCaption}"
+                                   TextColor="#AAFFFFFF"
+                                   HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Column="1"
+                            BackgroundColor="#25FFFFFF"
+                            StrokeShape="RoundRectangle 12"
+                            StrokeThickness="0"
+                            Padding="12,10"
+                            Margin="6,0,0,0">
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="{Binding CurrentLanguageDisplay}"
+                                   Style="{StaticResource BodyMedium}"
+                                   TextColor="White"
+                                   HorizontalOptions="Center"
+                                   FontFamily="PoppinsSemiBold"/>
+                            <Label Text="Ngôn ngữ hiện tại"
+                                   Style="{StaticResource LabelCaption}"
+                                   TextColor="#AAFFFFFF"
+                                   HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+            </VerticalStackLayout>
+
+            <!-- ── SETTINGS CARD ── -->
+            <Border BackgroundColor="{StaticResource Surface}"
+                    StrokeShape="RoundRectangle 24,24,0,0"
+                    StrokeThickness="0"
+                    Margin="0,-24,0,0"
+                    Padding="20,24,20,16">
+
+                <VerticalStackLayout Spacing="4">
+
+                    <!-- Language Setting -->
+                    <Label Text="Cài đặt"
+                           Style="{StaticResource TitleLarge}"
+                           Margin="0,0,0,12"/>
+
+                    <Border BackgroundColor="{StaticResource SurfaceVariant}"
+                            StrokeShape="RoundRectangle 14"
+                            StrokeThickness="0"
+                            Padding="16,14">
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Label Grid.Column="0" Text="🌐" FontSize="22" VerticalOptions="Center" Margin="0,0,12,0"/>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="Ngôn ngữ thuyết minh"
+                                       Style="{StaticResource TitleMedium}"/>
+                                <Label Text="{Binding CurrentLanguageDisplay}"
+                                       Style="{StaticResource BodySmall}"/>
+                            </VerticalStackLayout>
+                            <Switch Grid.Column="2"
+                                    OnColor="{StaticResource Primary}"
+                                    ThumbColor="White"
+                                    IsToggled="{Binding CurrentLanguageDisplay, Converter={StaticResource StringContainsConverter}, ConverterParameter='English'}"
+                                    Toggled="OnLanguageToggled"/>
+                        </Grid>
+                    </Border>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ── LISTEN HISTORY ── -->
+            <VerticalStackLayout Padding="20,4,20,20" Spacing="12">
+
+                <Label Text="📖 Lịch sử khám phá"
+                       Style="{StaticResource TitleLarge}"/>
+
+                <!-- Empty history -->
+                <Border BackgroundColor="{StaticResource Surface}"
+                        StrokeShape="RoundRectangle 14"
+                        StrokeThickness="0"
+                        Padding="20"
+                        IsVisible="{Binding ListenHistory.Count, Converter={StaticResource IntIsZeroConverter}}">
+                    <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <Label Text="🗺️" FontSize="40" HorizontalOptions="Center"/>
+                        <Label Text="Chưa có điểm nào được khám phá"
+                               Style="{StaticResource BodyMedium}"
+                               HorizontalOptions="Center"/>
+                        <Label Text="Hãy ghé thăm các điểm POI để nghe thuyết minh!"
+                               Style="{StaticResource BodySmall}"
+                               HorizontalOptions="Center"
+                               HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- History list -->
+                <CollectionView ItemsSource="{Binding ListenHistory}"
+                                SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="{StaticResource Surface}"
+                                    StrokeShape="RoundRectangle 12"
+                                    StrokeThickness="0"
+                                    Margin="0,4"
+                                    Padding="14,12">
+                                <Border.Shadow>
+                                    <Shadow Brush="#10000000" Offset="0,1" Radius="4" Opacity="0.1"/>
+                                </Border.Shadow>
+                                <Grid ColumnDefinitions="56,*,Auto">
+                                    <!-- Thumbnail -->
+                                    <Border Grid.Column="0"
+                                            StrokeShape="RoundRectangle 10"
+                                            StrokeThickness="0"
+                                            WidthRequest="56" HeightRequest="56">
+                                        <Image Source="{Binding POI.ImageUrl}"
+                                               Aspect="AspectFill"
+                                               WidthRequest="56" HeightRequest="56"/>
+                                    </Border>
+
+                                    <!-- Info -->
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         Padding="12,0"
+                                                         VerticalOptions="Center"
+                                                         Spacing="3">
+                                        <Label Text="{Binding POI.Shop.Name}"
+                                               Style="{StaticResource TitleMedium}"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1"/>
+                                        <Label Text="{Binding POI.Location}"
+                                               Style="{StaticResource BodySmall}"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1"/>
+                                    </VerticalStackLayout>
+
+                                    <!-- Arrow -->
+                                    <Label Grid.Column="2"
+                                           Text="›"
+                                           FontSize="22"
+                                           TextColor="{StaticResource TextHint}"
+                                           VerticalOptions="Center"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+
+            <!-- ── LOGOUT ── -->
+            <Button Text="🚪  Đăng xuất"
+                    Command="{Binding LogoutCommand}"
+                    Style="{StaticResource SecondaryButton}"
+                    Margin="20,0,20,32"
+                    HorizontalOptions="Fill"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

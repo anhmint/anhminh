@@ -1,4 +1,11 @@
 is_global = true
+build_property.MvvmToolkitEnableINotifyPropertyChangingSupport = true
+build_property._MvvmToolkitIsUsingWindowsRuntimePack = true
+build_property.CsWinRTComponent = 
+build_property.CsWinRTAotOptimizerEnabled = true
+build_property.CsWinRTAotOptimizerEnabled = true
+build_property.CsWinRTAotWarningLevel = 
+build_property.CsWinRTAotWarningLevel = 
 build_property.TargetFramework = net9.0-windows10.0.19041.0
 build_property.TargetFrameworkIdentifier = .NETCoreApp
 build_property.TargetFrameworkVersion = v9.0
@@ -13,13 +20,11 @@ build_property.RootNamespace = AppUser
 build_property.ProjectDir = C:\C# Project\poi-backend-api\front-end\App-user\AppUser\AppUser\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
-build_property.CsWinRTAotOptimizerEnabled = true
 build_property.CsWinRTAotExportsEnabled = 
 build_property.CsWinRTRcwFactoryFallbackGeneratorForceOptIn = 
 build_property.CsWinRTRcwFactoryFallbackGeneratorForceOptOut = 
 build_property.CsWinRTCcwLookupTableGeneratorEnabled = true
 build_property.CsWinRTMergeReferencedActivationFactories = 
-build_property.CsWinRTAotWarningLevel = 
 build_property.CsWinRTUseWindowsUIXamlProjections = false
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
@@ -41,6 +46,42 @@ build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = AppUser.MainPage.xaml
 build_metadata.AdditionalFiles.TargetPath = MainPage.xaml
 build_metadata.AdditionalFiles.RelativePath = MainPage.xaml
+
+[C:/C\# Project/poi-backend-api/front-end/App-user/AppUser/AppUser/Pages/AudioPlayerPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = AppUser.Pages.AudioPlayerPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Pages\AudioPlayerPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Pages\AudioPlayerPage.xaml
+
+[C:/C\# Project/poi-backend-api/front-end/App-user/AppUser/AppUser/Pages/HomePage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = AppUser.Pages.HomePage.xaml
+build_metadata.AdditionalFiles.TargetPath = Pages\HomePage.xaml
+build_metadata.AdditionalFiles.RelativePath = Pages\HomePage.xaml
+
+[C:/C\# Project/poi-backend-api/front-end/App-user/AppUser/AppUser/Pages/LoginPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = AppUser.Pages.LoginPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Pages\LoginPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Pages\LoginPage.xaml
+
+[C:/C\# Project/poi-backend-api/front-end/App-user/AppUser/AppUser/Pages/POIDetailPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = AppUser.Pages.POIDetailPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Pages\POIDetailPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Pages\POIDetailPage.xaml
+
+[C:/C\# Project/poi-backend-api/front-end/App-user/AppUser/AppUser/Pages/POIListPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = AppUser.Pages.POIListPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Pages\POIListPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Pages\POIListPage.xaml
+
+[C:/C\# Project/poi-backend-api/front-end/App-user/AppUser/AppUser/Pages/ProfilePage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = AppUser.Pages.ProfilePage.xaml
+build_metadata.AdditionalFiles.TargetPath = Pages\ProfilePage.xaml
+build_metadata.AdditionalFiles.RelativePath = Pages\ProfilePage.xaml
 
 [C:/C\# Project/poi-backend-api/front-end/App-user/AppUser/AppUser/Resources/Styles/Colors.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml

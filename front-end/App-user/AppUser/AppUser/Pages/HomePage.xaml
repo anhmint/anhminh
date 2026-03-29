@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AppUser.Pages.HomePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AppUser.ViewModels"
+    xmlns:models="clr-namespace:AppUser.Models"
+    Title="Trang chủ"
+    BackgroundColor="{StaticResource Background}">
+
+    <RefreshView Command="{Binding LoadFeaturedPOIsCommand}"
+                 IsRefreshing="{Binding IsLoading}"
+                 RefreshColor="{StaticResource Primary}">
+
+        <ScrollView>
+            <VerticalStackLayout Spacing="0">
+
+                <!-- ── HEADER ── -->
+                <Grid BackgroundColor="{StaticResource Primary}"
+                      Padding="20,16,20,40"
+                      RowDefinitions="Auto,Auto">
+
+                    <!-- Top row: greeting + language toggle -->
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+                        <VerticalStackLayout Grid.Column="0">
+                            <Label Text="{Binding GreetingText}"
+                                   Style="{StaticResource BodyMedium}"
+                                   TextColor="#DDFFFFFF"/>
+                            <Label Text="Khám phá ẩm thực"
+                                   Style="{StaticResource HeadlineSmall}"
+                                   TextColor="White"/>
+                        </VerticalStackLayout>
+
+                        <!-- Language Toggle -->
+                        <Border Grid.Column="1"
+                                BackgroundColor="#25FFFFFF"
+                                StrokeShape="RoundRectangle 20"
+                                StrokeThickness="0"
+                                Padding="12,6">
+                            <Button Text="{Binding CurrentLanguage, StringFormat='{0} ▼'}"
+                                    Command="{Binding ToggleLanguageCommand}"
+                                    BackgroundColor="Transparent"
+                                    TextColor="White"
+                                    FontFamily="PoppinsSemiBold"
+                                    FontSize="13"
+                                    Padding="0"
+                                    HeightRequest="32"/>
+                        </Border>
+                    </Grid>
+
+                    <!-- Search bar -->
+                    <Border Grid.Row="1"
+                            BackgroundColor="White"
+                            StrokeShape="RoundRectangle 14"
+                            StrokeThickness="0"
+                            Padding="14,10">
+                        <HorizontalStackLayout Spacing="10">
+                            <Label Text="🔍" FontSize="18" VerticalOptions="Center"/>
+                            <Label Text="Tìm điểm ẩm thực..."
+                                   Style="{StaticResource BodyMedium}"
+                                   TextColor="{StaticResource TextHint}"
+                                   VerticalOptions="Center">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding NavigateToAllPOIsCommand}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </HorizontalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- ── SECTION: Điểm nổi bật ── -->
+                <VerticalStackLayout Padding="20,24,20,0" Spacing="16">
+
+                    <!-- Section header -->
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                               Text="✨ Điểm ẩm thực nổi bật"
+                               Style="{StaticResource TitleLarge}"/>
+                        <Label Grid.Column="1"
+                               Text="Xem tất cả →"
+                               Style="{StaticResource BodySmall}"
+                               TextColor="{StaticResource Primary}"
+                               VerticalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding NavigateToAllPOIsCommand}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+
+                    <!-- Loading skeleton -->
+                    <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                       IsVisible="{Binding IsLoading}"
+                                       HeightRequest="200"
+                                       HorizontalOptions="Center"/>
+
+                    <!-- POI Cards (vertical list) -->
+                    <BindableLayout.ItemsSource>
+                        <x:Reference Name="FeaturedList"/>
+                    </BindableLayout.ItemsSource>
+
+                    <!-- Scrollable horizontal cards -->
+                    <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never"
+                                Margin="-20,0"
+                                IsVisible="{Binding IsLoading, Converter={StaticResource BoolInverterConverter}}">
+                        <HorizontalStackLayout x:Name="FeaturedList"
+                                               Spacing="12" Padding="20,4">
+                            <BindableLayout.ItemsSource>
+                                <Binding Path="FeaturedPOIs"/>
+                            </BindableLayout.ItemsSource>
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:POIDto">
+                                    <Border BackgroundColor="{StaticResource Surface}"
+                                            StrokeShape="RoundRectangle 16"
+                                            StrokeThickness="0"
+                                            WidthRequest="220"
+                                            HeightRequest="280">
+                                        <Border.Shadow>
+                                            <Shadow Brush="#20000000" Offset="0,4" Radius="12" Opacity="0.2"/>
+                                        </Border.Shadow>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=NavigateToPOICommand}"
+                                                CommandParameter="{Binding .}"/>
+                                        </Border.GestureRecognizers>
+
+                                        <Grid RowDefinitions="180,*">
+                                            <!-- POI Image -->
+                                            <Image Grid.Row="0"
+                                                   Source="{Binding ImageUrl}"
+                                                   Aspect="AspectFill"
+                                                   HeightRequest="180"/>
+
+                                            <!-- Audio badge -->
+                                            <Border Grid.Row="0"
+                                                    BackgroundColor="{StaticResource Primary}"
+                                                    StrokeShape="RoundRectangle 8"
+                                                    StrokeThickness="0"
+                                                    Padding="8,4"
+                                                    HorizontalOptions="End"
+                                                    VerticalOptions="End"
+                                                    Margin="0,0,8,8">
+                                                <Label Text="🎧 Có thuyết minh"
+                                                       Style="{StaticResource LabelCaption}"
+                                                       TextColor="White"/>
+                                            </Border>
+
+                                            <!-- Info section -->
+                                            <VerticalStackLayout Grid.Row="1" Padding="12,10" Spacing="4">
+                                                <Label Text="{Binding Shop.Name}"
+                                                       Style="{StaticResource TitleMedium}"
+                                                       LineBreakMode="TailTruncation"
+                                                       MaxLines="1"/>
+                                                <HorizontalStackLayout Spacing="4">
+                                                    <Label Text="📍" FontSize="11"/>
+                                                    <Label Text="{Binding Location}"
+                                                           Style="{StaticResource BodySmall}"
+                                                           LineBreakMode="TailTruncation"
+                                                           MaxLines="1"/>
+                                                </HorizontalStackLayout>
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </HorizontalStackLayout>
+                    </ScrollView>
+
+                </VerticalStackLayout>
+
+                <!-- ── SECTION: Tất cả địa điểm ── -->
+                <VerticalStackLayout Padding="20,24,20,20" Spacing="12">
+
+                    <Label Text="🗺️ Tất cả địa điểm"
+                           Style="{StaticResource TitleLarge}"/>
+
+                    <!-- Vertical POI List -->
+                    <CollectionView ItemsSource="{Binding FeaturedPOIs}"
+                                    SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:POIDto">
+                                <Border BackgroundColor="{StaticResource Surface}"
+                                        StrokeShape="RoundRectangle 14"
+                                        StrokeThickness="0"
+                                        Margin="0,4"
+                                        Padding="0">
+                                    <Border.Shadow>
+                                        <Shadow Brush="#10000000" Offset="0,2" Radius="8" Opacity="0.15"/>
+                                    </Border.Shadow>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=NavigateToPOICommand}"
+                                            CommandParameter="{Binding .}"/>
+                                    </Border.GestureRecognizers>
+
+                                    <Grid ColumnDefinitions="100,*" HeightRequest="90">
+                                        <Image Grid.Column="0"
+                                               Source="{Binding ImageUrl}"
+                                               Aspect="AspectFill"
+                                               WidthRequest="100"
+                                               HeightRequest="90"/>
+
+                                        <!-- Clip image frame -->
+                                        <Border Grid.Column="0"
+                                                BackgroundColor="Transparent"
+                                                StrokeShape="RoundRectangle 14,0,0,14"
+                                                StrokeThickness="0"
+                                                HorizontalOptions="Fill"
+                                                VerticalOptions="Fill"
+                                                IsVisible="False"/>
+
+                                        <VerticalStackLayout Grid.Column="1"
+                                                             Padding="14,12"
+                                                             Spacing="4"
+                                                             VerticalOptions="Center">
+                                            <Label Text="{Binding Shop.Name}"
+                                                   Style="{StaticResource TitleMedium}"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1"/>
+                                            <HorizontalStackLayout Spacing="4">
+                                                <Label Text="📍" FontSize="12"/>
+                                                <Label Text="{Binding Location}"
+                                                       Style="{StaticResource BodySmall}"
+                                                       LineBreakMode="TailTruncation"
+                                                       MaxLines="1"/>
+                                            </HorizontalStackLayout>
+                                            <HorizontalStackLayout Spacing="4" Margin="0,2,0,0">
+                                                <Label Text="🎧" FontSize="12"/>
+                                                <Label Text="Có thuyết minh audio"
+                                                       Style="{StaticResource LabelCaption}"
+                                                       TextColor="{StaticResource Primary}"/>
+                                            </HorizontalStackLayout>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>

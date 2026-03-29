@@ -1,0 +1,27 @@
+using AppUser.ViewModels;
+
+namespace AppUser.Pages
+{
+    public partial class ProfilePage : ContentPage
+    {
+        private readonly ProfileViewModel _vm;
+
+        public ProfilePage(ProfileViewModel vm)
+        {
+            InitializeComponent();
+            _vm = vm;
+            BindingContext = vm;
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            _vm.Initialize();
+        }
+
+        private void OnLanguageToggled(object sender, ToggledEventArgs e)
+        {
+            _vm.ToggleLanguageCommand.Execute(null);
+        }
+    }
+}
