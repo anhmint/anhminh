@@ -64,21 +64,6 @@
         <member name="P:AppUser.Services.AudioService.Progress">
             <summary>Get progress (0.0 - 1.0)</summary>
         </member>
-        <member name="T:AppUser.Services.AuthService">
-            <summary>
-            AuthService - Handles user authentication.
-            Currently uses mock data. Replace with HttpClient calls when API is ready.
-            </summary>
-        </member>
-        <member name="M:AppUser.Services.AuthService.LoginAsync(System.String,System.String)">
-            <summary>Login with email and password</summary>
-        </member>
-        <member name="M:AppUser.Services.AuthService.LogoutAsync">
-            <summary>Logout current user</summary>
-        </member>
-        <member name="M:AppUser.Services.AuthService.GetCurrentUser">
-            <summary>Get current logged-in user</summary>
-        </member>
         <member name="T:AppUser.Services.POIService">
             <summary>
             POIService - Provides POI data.
@@ -228,6 +213,7 @@
             <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
+            <inheritdoc/>
         </member>
         <member name="P:AppUser.ViewModels.LoginViewModel.Email">
             <inheritdoc cref="F:AppUser.ViewModels.LoginViewModel.email"/>
@@ -264,6 +250,12 @@
         </member>
         <member name="P:AppUser.ViewModels.LoginViewModel.ClearErrorCommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:AppUser.ViewModels.LoginViewModel.ClearError"/>.</summary>
+        </member>
+        <member name="F:AppUser.ViewModels.LoginViewModel.navigateToRegisterCommand">
+            <summary>The backing field for <see cref="P:AppUser.ViewModels.LoginViewModel.NavigateToRegisterCommand"/>.</summary>
+        </member>
+        <member name="P:AppUser.ViewModels.LoginViewModel.NavigateToRegisterCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:AppUser.ViewModels.LoginViewModel.NavigateToRegisterAsync"/>.</summary>
         </member>
         <member name="T:AppUser.ViewModels.POIDetailViewModel">
             <inheritdoc/>
@@ -392,6 +384,54 @@
         </member>
         <member name="P:AppUser.ViewModels.ProfileViewModel.NavigateToPOICommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:AppUser.ViewModels.ProfileViewModel.NavigateToPOIAsync(AppUser.Models.POIDto)"/>.</summary>
+        </member>
+        <member name="T:AppUser.ViewModels.RegisterViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:AppUser.ViewModels.RegisterViewModel.FullName">
+            <inheritdoc cref="F:AppUser.ViewModels.RegisterViewModel.fullName"/>
+        </member>
+        <member name="P:AppUser.ViewModels.RegisterViewModel.Email">
+            <inheritdoc cref="F:AppUser.ViewModels.RegisterViewModel.email"/>
+        </member>
+        <member name="P:AppUser.ViewModels.RegisterViewModel.Password">
+            <inheritdoc cref="F:AppUser.ViewModels.RegisterViewModel.password"/>
+        </member>
+        <member name="P:AppUser.ViewModels.RegisterViewModel.ConfirmPassword">
+            <inheritdoc cref="F:AppUser.ViewModels.RegisterViewModel.confirmPassword"/>
+        </member>
+        <member name="P:AppUser.ViewModels.RegisterViewModel.IsLoading">
+            <inheritdoc cref="F:AppUser.ViewModels.RegisterViewModel.isLoading"/>
+        </member>
+        <member name="P:AppUser.ViewModels.RegisterViewModel.ErrorMessage">
+            <inheritdoc cref="F:AppUser.ViewModels.RegisterViewModel.errorMessage"/>
+        </member>
+        <member name="P:AppUser.ViewModels.RegisterViewModel.HasError">
+            <inheritdoc cref="F:AppUser.ViewModels.RegisterViewModel.hasError"/>
+        </member>
+        <member name="P:AppUser.ViewModels.RegisterViewModel.IsPasswordVisible">
+            <inheritdoc cref="F:AppUser.ViewModels.RegisterViewModel.isPasswordVisible"/>
+        </member>
+        <member name="F:AppUser.ViewModels.RegisterViewModel.registerCommand">
+            <summary>The backing field for <see cref="P:AppUser.ViewModels.RegisterViewModel.RegisterCommand"/>.</summary>
+        </member>
+        <member name="P:AppUser.ViewModels.RegisterViewModel.RegisterCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:AppUser.ViewModels.RegisterViewModel.RegisterAsync"/>.</summary>
+        </member>
+        <member name="F:AppUser.ViewModels.RegisterViewModel.goBackToLoginCommand">
+            <summary>The backing field for <see cref="P:AppUser.ViewModels.RegisterViewModel.GoBackToLoginCommand"/>.</summary>
+        </member>
+        <member name="P:AppUser.ViewModels.RegisterViewModel.GoBackToLoginCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:AppUser.ViewModels.RegisterViewModel.GoBackToLoginAsync"/>.</summary>
+        </member>
+        <member name="F:AppUser.ViewModels.RegisterViewModel.togglePasswordVisibilityCommand">
+            <summary>The backing field for <see cref="P:AppUser.ViewModels.RegisterViewModel.TogglePasswordVisibilityCommand"/>.</summary>
+        </member>
+        <member name="P:AppUser.ViewModels.RegisterViewModel.TogglePasswordVisibilityCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:AppUser.ViewModels.RegisterViewModel.TogglePasswordVisibility"/>.</summary>
         </member>
         <member name="T:AppUser.Resource">
             <summary>
@@ -603,6 +643,12 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CurrentLanguageDisplay">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CurrentLanguageDisplay" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.FullName">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "FullName" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.ConfirmPassword">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "ConfirmPassword" generated properties.</summary>
+        </member>
         <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs">
             <summary>
             A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instances
@@ -686,6 +732,12 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CurrentLanguageDisplay">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CurrentLanguageDisplay" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.FullName">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "FullName" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.ConfirmPassword">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "ConfirmPassword" generated properties.</summary>
         </member>
     </members>
 </doc>

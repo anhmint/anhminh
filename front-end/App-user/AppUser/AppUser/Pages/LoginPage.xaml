@@ -164,7 +164,17 @@
             <VerticalStackLayout Grid.Row="2"
                                  Padding="28,12"
                                  BackgroundColor="{StaticResource Surface}">
-                <Label Text="© 2025 FoodTour POI · Khám phá ẩm thực"
+                
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="4" Margin="0,0,0,16">
+                    <Label Text="Chưa có tài khoản?" Style="{StaticResource BodyMedium}" />
+                    <Label Text="Đăng ký ngay" TextColor="{StaticResource Primary}" Style="{StaticResource TitleMedium}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding NavigateToRegisterCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </HorizontalStackLayout>
+
+                <Label Text="© 2026 FoodTour POI · Khám phá ẩm thực"
                        Style="{StaticResource LabelCaption}"
                        HorizontalOptions="Center"/>
             </VerticalStackLayout>

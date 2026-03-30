@@ -11,6 +11,7 @@ namespace AppUser
             // Register detail routes (not in tab bar)
             Routing.RegisterRoute("poiDetail", typeof(POIDetailPage));
             Routing.RegisterRoute("audioPlayer", typeof(AudioPlayerPage));
+            Routing.RegisterRoute("register", typeof(RegisterPage));
         }
     }
 }

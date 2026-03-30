@@ -26,9 +26,11 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login(LoginDto dto)
     {
+        var email = dto.Email?.Trim().ToLower();
+
         var user = _context.Users
             .Include(u => u.Role)
-            .FirstOrDefault(u => u.Email == dto.Email);
+            .FirstOrDefault(u => u.Email == email);
 
         if (user == null ||
             !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
@@ -67,27 +69,27 @@ public class AuthController : ControllerBase
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    // Resgister endpoint
+    // Generic Register endpoint for Admin Web (Owner/Admin/User)
     [HttpPost("register")]
     public IActionResult Register(RegisterDto dto)
     {
-        //if (dto.Role == RoleConstants.Owner)
-        //    return BadRequest("Cannot register as OWNER role");
+        if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Password))
+            return BadRequest("Email and password are required");
 
         if (_context.Users.Any(u => u.Email == dto.Email))
-            return BadRequest("Email existed");
+            return BadRequest("Email đã được sử dụng");
 
-        var roleName = dto.Role.Trim().ToLower();
+        var requestedRole = string.IsNullOrWhiteSpace(dto.Role) ? "OWNER" : dto.Role.ToUpper();
+        if (requestedRole != "OWNER" && requestedRole != "ADMIN" && requestedRole != "USER")
+            requestedRole = "OWNER";
 
-        var role = _context.Roles
-            .FirstOrDefault(r => r.Name.ToLower() == roleName);
-
+        var role = _context.Roles.FirstOrDefault(r => r.Name == requestedRole);
         if (role == null)
-            return BadRequest("Role invalid");
+            return StatusCode(500, $"Role {requestedRole} not configured");
 
         var user = new User
         {
-            Email = dto.Email,
+            Email = dto.Email.Trim().ToLower(),
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
             RoleId = role.Id
         };
@@ -95,7 +97,35 @@ public class AuthController : ControllerBase
         _context.Users.Add(user);
         _context.SaveChanges();
 
-        return Ok("Register successfully");
+        return Ok(new { message = "Đăng ký thành công", userId = user.Id });
+    }
+
+    // Register endpoint for user app (role always = USER)
+    [HttpPost("register-user")]
+    public IActionResult RegisterUser(UserRegisterDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Password))
+            return BadRequest("Email and password are required");
+
+        if (_context.Users.Any(u => u.Email == dto.Email))
+            return BadRequest("Email đã được sử dụng");
+
+        var role = _context.Roles.FirstOrDefault(r => r.Name == "USER");
+        if (role == null)
+            return StatusCode(500, "Role USER not configured");
+
+        var user = new User
+        {
+            Email = dto.Email.Trim().ToLower(),
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+            FullName = dto.FullName.Trim(),
+            RoleId = role.Id
+        };
+
+        _context.Users.Add(user);
+        _context.SaveChanges();
+
+        return Ok(new { message = "Đăng ký thành công", userId = user.Id });
     }
 
 

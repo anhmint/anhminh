@@ -1,14 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\front-end",
-    "\\front-end\\foodstreet-admin",
-    "\\front-end\\foodstreet-admin\\foodstreet-admin",
-    "\\front-end\\foodstreet-admin\\foodstreet-admin\\Components",
-    "\\front-end\\foodstreet-admin\\foodstreet-admin\\Components\\Pages",
-    "\\front-end\\foodstreet-admin\\foodstreet-admin\\Components\\Pages\\Seller",
-    "\\front-end\\foodstreet-admin\\foodstreet-admin\\Models",
-    "\\front-end\\foodstreet-admin\\foodstreet-admin\\Services"
+    "\\backend",
+    "\\backend\\PoiApi",
+    "\\backend\\PoiApi\\Models"
   ],
+  "SelectedNode": "\\backend\\PoiApi\\Models\\POITranslation.cs",
   "PreviewInSolutionExplorer": false
 }

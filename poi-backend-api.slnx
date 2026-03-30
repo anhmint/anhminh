@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="backend/PoiApi/PoiApi.csproj" />
+  <Project Path="front-end/App-user/AppUser/AppUser/AppUser.csproj" />
+  <Project Path="front-end/foodstreet-admin/foodstreet-admin/foodstreet-admin.csproj" />
+</Solution>

@@ -38,11 +38,11 @@
             "targetAlias": "net9.0-android",
             "projectReferences": {}
           },
-          "net9.0-ios26.0": {
+          "net9.0-ios26.2": {
             "targetAlias": "net9.0-ios",
             "projectReferences": {}
           },
-          "net9.0-maccatalyst26.0": {
+          "net9.0-maccatalyst26.2": {
             "targetAlias": "net9.0-maccatalyst",
             "projectReferences": {}
           },
@@ -61,7 +61,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net9.0-android35.0": {
@@ -90,7 +90,7 @@
             "Microsoft.NET.ILLink.Tasks": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.13, )",
+              "version": "[9.0.14, )",
               "autoReferenced": true
             }
           },
@@ -120,15 +120,15 @@
             },
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[9.0.13, 9.0.13]"
+              "version": "[9.0.14, 9.0.14]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[9.0.13, 9.0.13]"
+              "version": "[9.0.14, 9.0.14]"
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[9.0.13, 9.0.13]"
+              "version": "[9.0.14, 9.0.14]"
             }
           ],
           "frameworkReferences": {
@@ -139,9 +139,9 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json"
         },
-        "net9.0-ios26.0": {
+        "net9.0-ios26.2": {
           "targetAlias": "net9.0-ios",
           "dependencies": {
             "CommunityToolkit.Maui": {
@@ -167,7 +167,7 @@
             "Microsoft.NET.ILLink.Tasks": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.13, )",
+              "version": "[9.0.14, )",
               "autoReferenced": true
             }
           },
@@ -185,23 +185,23 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[9.0.13, 9.0.13]"
+              "version": "[9.0.14, 9.0.14]"
             },
             {
-              "name": "Microsoft.iOS.Ref.net9.0_26.0",
-              "version": "[26.0.9783, 26.0.9783]"
+              "name": "Microsoft.iOS.Ref.net9.0_26.2",
+              "version": "[26.2.9000, 26.2.9000]"
             },
             {
-              "name": "Microsoft.iOS.Runtime.iossimulator-x64.net9.0_26.0",
-              "version": "[26.0.9783, 26.0.9783]"
+              "name": "Microsoft.iOS.Runtime.iossimulator-x64.net9.0_26.2",
+              "version": "[26.2.9000, 26.2.9000]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[9.0.13, 9.0.13]"
+              "version": "[9.0.14, 9.0.14]"
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[9.0.13, 9.0.13]"
+              "version": "[9.0.14, 9.0.14]"
             }
           ],
           "frameworkReferences": {
@@ -212,9 +212,9 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json"
         },
-        "net9.0-maccatalyst26.0": {
+        "net9.0-maccatalyst26.2": {
           "targetAlias": "net9.0-maccatalyst",
           "dependencies": {
             "CommunityToolkit.Maui": {
@@ -240,7 +240,7 @@
             "Microsoft.NET.ILLink.Tasks": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.13, )",
+              "version": "[9.0.14, )",
               "autoReferenced": true
             }
           },
@@ -259,23 +259,23 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[9.0.13, 9.0.13]"
+              "version": "[9.0.14, 9.0.14]"
             },
             {
-              "name": "Microsoft.MacCatalyst.Ref.net9.0_26.0",
-              "version": "[26.0.9783, 26.0.9783]"
+              "name": "Microsoft.MacCatalyst.Ref.net9.0_26.2",
+              "version": "[26.2.9000, 26.2.9000]"
             },
             {
-              "name": "Microsoft.MacCatalyst.Runtime.maccatalyst-x64.net9.0_26.0",
-              "version": "[26.0.9783, 26.0.9783]"
+              "name": "Microsoft.MacCatalyst.Runtime.maccatalyst-x64.net9.0_26.2",
+              "version": "[26.2.9000, 26.2.9000]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[9.0.13, 9.0.13]"
+              "version": "[9.0.14, 9.0.14]"
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[9.0.13, 9.0.13]"
+              "version": "[9.0.14, 9.0.14]"
             }
           ],
           "frameworkReferences": {
@@ -286,7 +286,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json"
         },
         "net9.0-windows10.0.19041": {
           "targetAlias": "net9.0-windows10.0.19041.0",
@@ -326,15 +326,15 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[9.0.13, 9.0.13]"
+              "version": "[9.0.14, 9.0.14]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[9.0.13, 9.0.13]"
+              "version": "[9.0.14, 9.0.14]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[9.0.13, 9.0.13]"
+              "version": "[9.0.14, 9.0.14]"
             },
             {
               "name": "Microsoft.Windows.SDK.NET.Ref",
@@ -342,7 +342,7 @@
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[9.0.13, 9.0.13]"
+              "version": "[9.0.14, 9.0.14]"
             }
           ],
           "frameworkReferences": {
@@ -353,7 +353,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201\\RuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {

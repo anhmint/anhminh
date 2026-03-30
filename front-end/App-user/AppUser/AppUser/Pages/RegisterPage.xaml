@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AppUser.Pages.RegisterPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AppUser.ViewModels"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="{StaticResource Background}">
+
+    <ScrollView>
+        <Grid RowDefinitions="Auto,*,Auto" MinimumHeightRequest="750">
+
+            <!-- ── TOP DECORATIVE AREA ── -->
+            <Grid Grid.Row="0" HeightRequest="240" BackgroundColor="{StaticResource Primary}">
+
+                <!-- Background gradient overlay -->
+                <BoxView Color="{StaticResource PrimaryDark}" Opacity="0.3"
+                         HorizontalOptions="Fill" VerticalOptions="Fill"/>
+
+                <!-- Decorative circles -->
+                <Ellipse Fill="{StaticResource PrimaryLight}" Opacity="0.2"
+                         WidthRequest="150" HeightRequest="150"
+                         HorizontalOptions="End" VerticalOptions="Start"
+                         Margin="0,-40,-40,0"/>
+                <Ellipse Fill="{StaticResource Secondary}" Opacity="0.15"
+                         WidthRequest="100" HeightRequest="100"
+                         HorizontalOptions="Start" VerticalOptions="End"
+                         Margin="-20,0,0,20"/>
+
+                <!-- Header Content -->
+                <VerticalStackLayout Spacing="5" Padding="20,40,20,0">
+                    <Button Text="←" Style="{StaticResource IconButton}" 
+                            HorizontalOptions="Start" TextColor="White" FontSize="24"
+                            Command="{Binding GoBackToLoginCommand}" />
+                    
+                    <Label Text="Tạo tài khoản"
+                           Style="{StaticResource HeadlineMedium}"
+                           TextColor="White"
+                           HorizontalOptions="Center"
+                           FontFamily="PoppinsBold"/>
+                    <Label Text="Tham gia cộng đồng FoodTour"
+                           Style="{StaticResource BodyMedium}"
+                           TextColor="#E8FFFFFF"
+                           HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Grid>
+
+            <!-- ── REGISTER FORM CARD ── -->
+            <Border Grid.Row="1"
+                    BackgroundColor="{StaticResource Surface}"
+                    StrokeShape="RoundRectangle 28,28,0,0"
+                    StrokeThickness="0"
+                    Margin="0,-28,0,0"
+                    Padding="28,36,28,20">
+
+                <VerticalStackLayout Spacing="0">
+
+                    <!-- Error Banner -->
+                    <Border BackgroundColor="#FFF3F3"
+                            StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0"
+                            Padding="14,12"
+                            Margin="0,0,0,16"
+                            IsVisible="{Binding HasError}">
+                        <HorizontalStackLayout Spacing="8">
+                            <Label Text="⚠️" FontSize="16" VerticalOptions="Center"/>
+                            <Label Text="{Binding ErrorMessage}"
+                                   Style="{StaticResource BodySmall}"
+                                   TextColor="{StaticResource Error}"
+                                   VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Full Name Field -->
+                    <Label Text="Họ và Tên" Style="{StaticResource TitleMedium}" Margin="0,0,0,6"/>
+                    <Border BackgroundColor="{StaticResource SurfaceVariant}"
+                            StrokeShape="RoundRectangle 12" StrokeThickness="1.5" Stroke="{StaticResource Border}"
+                            Padding="16,4" Margin="0,0,0,16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Entry Grid.Column="0"
+                                   Style="{StaticResource InputEntry}"
+                                   Placeholder="Như Nguyễn"
+                                   Text="{Binding FullName}"
+                                   ReturnType="Next"/>
+                            <Label Grid.Column="1" Text="👤" FontSize="18" VerticalOptions="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Email Field -->
+                    <Label Text="Email" Style="{StaticResource TitleMedium}" Margin="0,0,0,6"/>
+                    <Border BackgroundColor="{StaticResource SurfaceVariant}"
+                            StrokeShape="RoundRectangle 12" StrokeThickness="1.5" Stroke="{StaticResource Border}"
+                            Padding="16,4" Margin="0,0,0,16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Entry Grid.Column="0"
+                                   Style="{StaticResource InputEntry}"
+                                   Placeholder="email@example.com"
+                                   Text="{Binding Email}"
+                                   Keyboard="Email"
+                                   ReturnType="Next"/>
+                            <Label Grid.Column="1" Text="📧" FontSize="18" VerticalOptions="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Password Field -->
+                    <Label Text="Mật khẩu" Style="{StaticResource TitleMedium}" Margin="0,0,0,6"/>
+                    <Border BackgroundColor="{StaticResource SurfaceVariant}"
+                            StrokeShape="RoundRectangle 12" StrokeThickness="1.5" Stroke="{StaticResource Border}"
+                            Padding="16,4" Margin="0,0,0,16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Entry Grid.Column="0"
+                                   Style="{StaticResource InputEntry}"
+                                   Placeholder="Ít nhất 6 ký tự"
+                                   Text="{Binding Password}"
+                                   IsPassword="{Binding IsPasswordVisible, Converter={StaticResource BoolInverterConverter}}"
+                                   ReturnType="Next" />
+                            <Button Grid.Column="1" Text="👁️" Command="{Binding TogglePasswordVisibilityCommand}"
+                                    Style="{StaticResource IconButton}" FontSize="18"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Confirm Password Field -->
+                    <Label Text="Xác nhận mật khẩu" Style="{StaticResource TitleMedium}" Margin="0,0,0,6"/>
+                    <Border BackgroundColor="{StaticResource SurfaceVariant}"
+                            StrokeShape="RoundRectangle 12" StrokeThickness="1.5" Stroke="{StaticResource Border}"
+                            Padding="16,4" Margin="0,0,0,28">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Entry Grid.Column="0"
+                                   Style="{StaticResource InputEntry}"
+                                   Placeholder="Nhập lại mật khẩu"
+                                   Text="{Binding ConfirmPassword}"
+                                   IsPassword="{Binding IsPasswordVisible, Converter={StaticResource BoolInverterConverter}}"
+                                   ReturnType="Done"
+                                   ReturnCommand="{Binding RegisterCommand}"/>
+                            <Label Grid.Column="1" Text="🔒" FontSize="18" VerticalOptions="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Register Button -->
+                    <Button Text="Đăng ký"
+                            Command="{Binding RegisterCommand}"
+                            Style="{StaticResource PrimaryButton}"
+                            IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInverterConverter}}"
+                            HorizontalOptions="Fill"/>
+
+                    <!-- Loading Indicator -->
+                    <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                       IsVisible="{Binding IsLoading}"
+                                       HorizontalOptions="Center"
+                                       Margin="0,16,0,0"/>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ── FOOTER ── -->
+            <VerticalStackLayout Grid.Row="2"
+                                 Padding="28,20"
+                                 BackgroundColor="{StaticResource Surface}">
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
+                    <Label Text="Đã có tài khoản?" Style="{StaticResource BodyMedium}" />
+                    <Label Text="Đăng nhập" TextColor="{StaticResource Primary}" Style="{StaticResource TitleMedium}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoBackToLoginCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+        </Grid>
+    </ScrollView>
+</ContentPage>

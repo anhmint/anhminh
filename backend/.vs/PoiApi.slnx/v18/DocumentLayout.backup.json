@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\C# Project\\poi-backend-api\\backend\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{3214838C-468D-DCF0-E7EF-6F7B15478F5B}|PoiApi\\PoiApi.csproj|c:\\c# project\\poi-backend-api\\backend\\poiapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{3214838C-468D-DCF0-E7EF-6F7B15478F5B}|PoiApi\\PoiApi.csproj|solutionrelative:poiapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{3214838C-468D-DCF0-E7EF-6F7B15478F5B}|PoiApi\\PoiApi.csproj|c:\\c# project\\poi-backend-api\\backend\\poiapi\\dtos\\owner\\menu\\createmenudto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{3214838C-468D-DCF0-E7EF-6F7B15478F5B}|PoiApi\\PoiApi.csproj|solutionrelative:poiapi\\dtos\\owner\\menu\\createmenudto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -86,19 +90,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
-            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\appsettings.json",
+              "RelativeDocumentMoniker": "PoiApi\\appsettings.json",
+              "ToolTip": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\appsettings.json",
+              "RelativeToolTip": "PoiApi\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-03-23T14:43:40.12Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "CreateMenuDto.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\DTOs\\Owner\\Menu\\CreateMenuDto.cs",
               "RelativeDocumentMoniker": "PoiApi\\DTOs\\Owner\\Menu\\CreateMenuDto.cs",
@@ -111,7 +120,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "AuthController.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Controllers\\AuthController.cs",
               "RelativeDocumentMoniker": "PoiApi\\Controllers\\AuthController.cs",
@@ -119,12 +128,11 @@
               "RelativeToolTip": "PoiApi\\Controllers\\AuthController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAsAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-06T01:52:49.036Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-06T01:52:49.036Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "UsersController.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Controllers\\Admin\\UsersController.cs",
               "RelativeDocumentMoniker": "PoiApi\\Controllers\\Admin\\UsersController.cs",
@@ -136,7 +144,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "MenusController.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Controllers\\Owner\\MenusController.cs",
               "RelativeDocumentMoniker": "PoiApi\\Controllers\\Owner\\MenusController.cs",
@@ -148,7 +156,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "IPoiService.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Services\\Interfaces\\IPoiService.cs",
               "RelativeDocumentMoniker": "PoiApi\\Services\\Interfaces\\IPoiService.cs",
@@ -160,7 +168,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "IMenuItemService.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Services\\Interfaces\\IMenuItemService.cs",
               "RelativeDocumentMoniker": "PoiApi\\Services\\Interfaces\\IMenuItemService.cs",
@@ -172,7 +180,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "IMenuService.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Services\\Interfaces\\IMenuService.cs",
               "RelativeDocumentMoniker": "PoiApi\\Services\\Interfaces\\IMenuService.cs",
@@ -184,7 +192,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "AppMenusController.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Controllers\\App\\AppMenusController.cs",
               "RelativeDocumentMoniker": "PoiApi\\Controllers\\App\\AppMenusController.cs",
@@ -196,7 +204,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "MenuService.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Services\\Implementations\\MenuService.cs",
               "RelativeDocumentMoniker": "PoiApi\\Services\\Implementations\\MenuService.cs",
@@ -208,7 +216,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "MenuItemsController.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Controllers\\Admin\\MenuItemsController.cs",
               "RelativeDocumentMoniker": "PoiApi\\Controllers\\Admin\\MenuItemsController.cs",
@@ -220,7 +228,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "MenusController.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Controllers\\Admin\\MenusController.cs",
               "RelativeDocumentMoniker": "PoiApi\\Controllers\\Admin\\MenusController.cs",
@@ -232,7 +240,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "MenuItem.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Models\\MenuItem.cs",
               "RelativeDocumentMoniker": "PoiApi\\Models\\MenuItem.cs",
@@ -244,7 +252,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "Menu.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Models\\Menu.cs",
               "RelativeDocumentMoniker": "PoiApi\\Models\\Menu.cs",
@@ -256,7 +264,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "CreateOwnerDto.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\DTOs\\Admin\\Requests\\CreateOwnerDto.cs",
               "RelativeDocumentMoniker": "PoiApi\\DTOs\\Admin\\Requests\\CreateOwnerDto.cs",
@@ -268,7 +276,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Data\\AppDbContext.cs",
               "RelativeDocumentMoniker": "PoiApi\\Data\\AppDbContext.cs",
@@ -280,7 +288,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 17,
               "Title": "AppDbContextFactory.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Data\\AppDbContextFactory.cs",
               "RelativeDocumentMoniker": "PoiApi\\Data\\AppDbContextFactory.cs",
@@ -292,7 +300,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 18,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Program.cs",
               "RelativeDocumentMoniker": "PoiApi\\Program.cs",
@@ -304,7 +312,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "User.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Models\\User.cs",
               "RelativeDocumentMoniker": "PoiApi\\Models\\User.cs",
@@ -316,7 +324,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 19,
               "Title": "README.md",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\README.md",
               "RelativeDocumentMoniker": "PoiApi\\README.md",

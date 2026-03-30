@@ -84,5 +84,11 @@ namespace AppUser.ViewModels
             HasError = false;
             ErrorMessage = string.Empty;
         }
+
+        [RelayCommand]
+        private async Task NavigateToRegisterAsync()
+        {
+            await Shell.Current.GoToAsync("register");
+        }
     }
 }

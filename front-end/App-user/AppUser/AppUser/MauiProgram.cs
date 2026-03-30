@@ -25,6 +25,7 @@ namespace AppUser
                 });
 
             // Register Services
+            builder.Services.AddSingleton<HttpClient>();
             builder.Services.AddSingleton<AuthService>();
             builder.Services.AddSingleton<POIService>();
             builder.Services.AddSingleton<AudioService>();
@@ -36,6 +37,7 @@ namespace AppUser
             builder.Services.AddTransient<POIDetailViewModel>();
             builder.Services.AddTransient<AudioPlayerViewModel>();
             builder.Services.AddTransient<ProfileViewModel>();
+            builder.Services.AddTransient<RegisterViewModel>();
 
             // Register Pages
             builder.Services.AddTransient<Pages.LoginPage>();
@@ -44,6 +46,7 @@ namespace AppUser
             builder.Services.AddTransient<Pages.POIDetailPage>();
             builder.Services.AddTransient<Pages.AudioPlayerPage>();
             builder.Services.AddTransient<Pages.ProfilePage>();
+            builder.Services.AddTransient<Pages.RegisterPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();
