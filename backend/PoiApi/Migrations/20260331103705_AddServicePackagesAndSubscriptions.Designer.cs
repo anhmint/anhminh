@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PoiApi.Data;
 
@@ -11,9 +12,11 @@ using PoiApi.Data;
 namespace PoiApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260331103705_AddServicePackagesAndSubscriptions")]
+    partial class AddServicePackagesAndSubscriptions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,14 +146,8 @@ namespace PoiApi.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("longtext");
 
-                    b.Property<double?>("Latitude")
-                        .HasColumnType("double");
-
                     b.Property<string>("Location")
                         .HasColumnType("longtext");
-
-                    b.Property<double?>("Longitude")
-                        .HasColumnType("double");
 
                     b.HasKey("Id");
 
