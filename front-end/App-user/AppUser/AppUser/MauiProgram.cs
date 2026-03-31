@@ -38,6 +38,7 @@ namespace AppUser
             builder.Services.AddTransient<AudioPlayerViewModel>();
             builder.Services.AddTransient<ProfileViewModel>();
             builder.Services.AddTransient<RegisterViewModel>();
+            builder.Services.AddTransient<EditProfileViewModel>();
 
             // Register Pages
             builder.Services.AddTransient<Pages.LoginPage>();
@@ -47,6 +48,7 @@ namespace AppUser
             builder.Services.AddTransient<Pages.AudioPlayerPage>();
             builder.Services.AddTransient<Pages.ProfilePage>();
             builder.Services.AddTransient<Pages.RegisterPage>();
+            builder.Services.AddTransient<Pages.EditProfilePage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

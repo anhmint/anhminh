@@ -17,6 +17,8 @@ namespace AppUser.Services
                 Id = 1,
                 ImageUrl = "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800",
                 Location = "123 Lê Thánh Tôn, Quận 1, TP.HCM",
+                Latitude = 10.7744,
+                Longitude = 106.7015,
                 Translations = new()
                 {
                     new() { Id=1, POIId=1, LanguageCode="vi", Name="Quán Phở Hương Xưa", Description="Quán phở truyền thống với hơn 30 năm lịch sử tại Sài Gòn. Nước dùng được ninh từ xương bò trong 8 tiếng, tạo vị ngọt đậm đà khó quên. Phở bò tái nạm là món đặc trưng thu hút hàng trăm thực khách mỗi sáng." },
@@ -57,6 +59,8 @@ namespace AppUser.Services
                 Id = 2,
                 ImageUrl = "https://images.unsplash.com/photo-1626804475297-41608ea09aeb?w=800",
                 Location = "45 Nguyễn Huệ, Quận 1, TP.HCM",
+                Latitude = 10.7738,
+                Longitude = 106.7032,
                 Translations = new()
                 {
                     new() { Id=3, POIId=2, LanguageCode="vi", Name="Cơm Tấm Bà Tư", Description="Cơm tấm Nam Bộ chính gốc với sườn bì chả thơm lừng. Quán đã phục vụ người Sài Gòn từ năm 1985 với công thức gia truyền không thay đổi. Đây là điểm dừng chân không thể bỏ qua cho những ai yêu ẩm thực đường phố." },
@@ -93,6 +97,8 @@ namespace AppUser.Services
                 Id = 3,
                 ImageUrl = "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=800",
                 Location = "78 Bùi Viện, Quận 1, TP.HCM",
+                Latitude = 10.7675,
+                Longitude = 106.6917,
                 Translations = new()
                 {
                     new() { Id=5, POIId=3, LanguageCode="vi", Name="Bánh Mì Huỳnh Hoa", Description="Bánh mì được mệnh danh là ngon nhất Sài Gòn. Ổ bánh căng bóng với nhân thịt, chả, pate và rau thơm tươi mát. Hàng quán lúc nào cũng đông khách từ sáng sớm đến tận chiều tối." },
@@ -128,6 +134,8 @@ namespace AppUser.Services
                 Id = 4,
                 ImageUrl = "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800",
                 Location = "10 Đặng Trần Côn, Quận 1, TP.HCM",
+                Latitude = 10.7725,
+                Longitude = 106.6925,
                 Translations = new()
                 {
                     new() { Id=7, POIId=4, LanguageCode="vi", Name="Chè Hiển Khánh", Description="Thiên đường chè Sài Gòn với hơn 50 loại chè khác nhau. Từ chè ba màu, chè thái, đến chè đậu đỏ bánh lọt — tất cả đều được nấu tươi mỗi ngày với nguyên liệu chọn lọc." },
@@ -163,6 +171,8 @@ namespace AppUser.Services
                 Id = 5,
                 ImageUrl = "https://images.unsplash.com/photo-1562802378-063ec186a863?w=800",
                 Location = "Chợ Bến Thành, Quận 1, TP.HCM",
+                Latitude = 10.7725,
+                Longitude = 106.6980,
                 Translations = new()
                 {
                     new() { Id=9, POIId=5, LanguageCode="vi", Name="Bún Bò Huế Mệ Tư", Description="Bún bò Huế chuẩn vị miền Trung với nước dùng đặc trưng màu đỏ gạch từ sả, mắm ruốc và ớt. Thịt bò mềm, chả cua giòn — đây là điểm đến không thể bỏ qua cho người yêu món Huế." },

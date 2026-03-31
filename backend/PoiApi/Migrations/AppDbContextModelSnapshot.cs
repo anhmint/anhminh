@@ -143,8 +143,14 @@ namespace PoiApi.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("longtext");
 
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("double");
+
                     b.Property<string>("Location")
                         .HasColumnType("longtext");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("double");
 
                     b.HasKey("Id");
 

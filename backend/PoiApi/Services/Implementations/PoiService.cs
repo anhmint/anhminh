@@ -29,6 +29,8 @@ public class PoiService : IPoiService
 				Id = p.Id,
 				ImageUrl = p.ImageUrl,
 				Location = p.Location,
+				Latitude = p.Latitude,
+				Longitude = p.Longitude,
 				Name = t.Name,
 				Description = t.Description
 			};
@@ -50,6 +52,8 @@ public class PoiService : IPoiService
 			Id = poi.Id,
 			ImageUrl = poi.ImageUrl,
 			Location = poi.Location,
+			Latitude = poi.Latitude,
+			Longitude = poi.Longitude,
 			Name = t.Name,
 			Description = t.Description
 		};
@@ -61,6 +65,8 @@ public class PoiService : IPoiService
 		{
 			ImageUrl = dto.ImageUrl,
 			Location = dto.Location,
+			Latitude = dto.Latitude,
+			Longitude = dto.Longitude,
 			Translations = dto.Translations.Select(t => new POITranslation
 			{
 				LanguageCode = t.LanguageCode,
@@ -79,6 +85,8 @@ public class PoiService : IPoiService
 			Id = poi.Id,
 			ImageUrl = poi.ImageUrl,
 			Location = poi.Location,
+			Latitude = poi.Latitude,
+			Longitude = poi.Longitude,
 			Name = first.Name,
 			Description = first.Description
 		};

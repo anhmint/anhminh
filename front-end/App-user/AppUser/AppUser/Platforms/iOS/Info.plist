@@ -28,5 +28,7 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Ứng dụng cần sử dụng vị trí để nhắc nhở những địa điểm ẩm thực gần bạn.</string>
 </dict>
 </plist>

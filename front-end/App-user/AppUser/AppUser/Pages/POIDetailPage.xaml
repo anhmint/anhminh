@@ -13,16 +13,22 @@
             <VerticalStackLayout Spacing="0">
 
                 <!-- ── HERO IMAGE ── -->
-                <Grid HeightRequest="300">
+                <Grid HeightRequest="380">
                     <Image Source="{Binding POI.ImageUrl}"
                            Aspect="AspectFill"
-                           HeightRequest="300"
+                           HeightRequest="380"
                            HorizontalOptions="Fill"/>
 
                     <!-- Dark gradient overlay -->
-                    <BoxView Color="#60000000"
-                             HorizontalOptions="Fill"
-                             VerticalOptions="Fill"/>
+                    <BoxView HorizontalOptions="Fill" VerticalOptions="Fill">
+                        <BoxView.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="#40000000" Offset="0" />
+                                <GradientStop Color="#80000000" Offset="0.6" />
+                                <GradientStop Color="#D0000000" Offset="1" />
+                            </LinearGradientBrush>
+                        </BoxView.Background>
+                    </BoxView>
 
                     <!-- Back button -->
                     <Border BackgroundColor="#80000000"
@@ -171,32 +177,32 @@
                                                 <CollectionView.ItemTemplate>
                                                     <DataTemplate x:DataType="models:MenuItemDto">
                                                         <Border BackgroundColor="{StaticResource Surface}"
-                                                                StrokeShape="RoundRectangle 12"
-                                                                StrokeThickness="1"
-                                                                Stroke="{StaticResource Border}"
-                                                                Padding="14,12"
-                                                                Margin="0,4">
+                                                                StrokeShape="RoundRectangle 16"
+                                                                StrokeThickness="0"
+                                                                Margin="0,6,0,8"
+                                                                Padding="16,16">
+                                                            <Border.Shadow>
+                                                                <Shadow Brush="#15000000" Offset="0,4" Radius="10" Opacity="1"/>
+                                                            </Border.Shadow>
                                                             <Grid ColumnDefinitions="*,Auto">
-                                                                <VerticalStackLayout Grid.Column="0" Spacing="3">
+                                                                <VerticalStackLayout Grid.Column="0" Spacing="4">
                                                                     <Label Text="{Binding Name}"
-                                                                           Style="{StaticResource TitleMedium}"/>
+                                                                           FontFamily="PoppinsBold" FontSize="16" TextColor="{StaticResource TextPrimary}"/>
                                                                     <Label Text="{Binding Description}"
-                                                                           Style="{StaticResource BodySmall}"
+                                                                           FontFamily="PoppinsRegular" FontSize="13" TextColor="{StaticResource TextSecondary}"
                                                                            LineBreakMode="TailTruncation"
                                                                            MaxLines="2"/>
                                                                 </VerticalStackLayout>
                                                                 <VerticalStackLayout Grid.Column="1"
                                                                                      HorizontalOptions="End"
-                                                                                     VerticalOptions="Center">
+                                                                                     VerticalOptions="Center" Spacing="2">
                                                                     <Label Text="{Binding PriceDisplay}"
-                                                                           Style="{StaticResource TitleMedium}"
+                                                                           FontFamily="PoppinsSemiBold" FontSize="16"
                                                                            TextColor="{StaticResource Primary}"
                                                                            HorizontalOptions="End"/>
-                                                                    <Label Text="Còn hàng"
-                                                                           Style="{StaticResource LabelCaption}"
-                                                                           TextColor="{StaticResource Success}"
-                                                                           IsVisible="{Binding IsAvailable}"
-                                                                           HorizontalOptions="End"/>
+                                                                    <Border BackgroundColor="#E8F5E9" StrokeShape="RoundRectangle 8" StrokeThickness="0" Padding="8,4" IsVisible="{Binding IsAvailable}" HorizontalOptions="End">
+                                                                        <Label Text="Còn hàng" FontFamily="PoppinsMedium" FontSize="10" TextColor="{StaticResource Success}"/>
+                                                                    </Border>
                                                                 </VerticalStackLayout>
                                                             </Grid>
                                                         </Border>
@@ -218,12 +224,29 @@
         </ScrollView>
 
         <!-- ── FLOATING PLAY BUTTON ── -->
-        <Button Text="🎧  Nghe thuyết minh ngay"
-                Command="{Binding PlayAudioCommand}"
-                Style="{StaticResource PrimaryButton}"
+        <Border StrokeShape="RoundRectangle 24"
+                StrokeThickness="0"
                 IsVisible="{Binding HasAudio}"
                 HorizontalOptions="Fill"
                 VerticalOptions="End"
-                Margin="20,0,20,24"/>
+                Margin="20,0,20,32"
+                HeightRequest="56">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="{StaticResource Primary}" Offset="0.0" />
+                    <GradientStop Color="{StaticResource PrimaryDark}" Offset="1.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.Shadow>
+                <Shadow Brush="{StaticResource PrimaryDark}" Offset="0,10" Radius="20" Opacity="0.5"/>
+            </Border.Shadow>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding PlayAudioCommand}" />
+            </Border.GestureRecognizers>
+            <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="12">
+                <Label Text="🎧" FontSize="24" TextColor="White" VerticalOptions="Center"/>
+                <Label Text="Nghe thuyết minh ngay" FontFamily="PoppinsBold" FontSize="16" TextColor="White" VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+        </Border>
     </Grid>
 </ContentPage>

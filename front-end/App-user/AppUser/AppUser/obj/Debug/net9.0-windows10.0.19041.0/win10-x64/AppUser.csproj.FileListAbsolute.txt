@@ -549,3 +549,5 @@ C:\C# Project\poi-backend-api\front-end\App-user\AppUser\AppUser\obj\Debug\net9.
 C:\C# Project\poi-backend-api\front-end\App-user\AppUser\AppUser\obj\Debug\net9.0-windows10.0.19041.0\win10-x64\qualifiers.txt
 C:\C# Project\poi-backend-api\front-end\App-user\AppUser\AppUser\obj\Debug\net9.0-windows10.0.19041.0\win10-x64\qualifiers.txt.intermediate
 C:\C# Project\poi-backend-api\front-end\App-user\AppUser\AppUser\obj\Debug\net9.0-windows10.0.19041.0\win10-x64\MultipleQualifiersPerDimensionFound.txt
+C:\C# Project\poi-backend-api\front-end\App-user\AppUser\AppUser\bin\Debug\net9.0-windows10.0.19041.0\win10-x64\Microsoft.Maui.Controls.Maps.dll
+C:\C# Project\poi-backend-api\front-end\App-user\AppUser\AppUser\bin\Debug\net9.0-windows10.0.19041.0\win10-x64\Microsoft.Maui.Maps.dll

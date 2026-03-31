@@ -12,6 +12,7 @@ namespace AppUser
             Routing.RegisterRoute("poiDetail", typeof(POIDetailPage));
             Routing.RegisterRoute("audioPlayer", typeof(AudioPlayerPage));
             Routing.RegisterRoute("register", typeof(RegisterPage));
+            Routing.RegisterRoute("editProfile", typeof(EditProfilePage));
         }
     }
 }

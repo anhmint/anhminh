@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using PoiApi.Data;
@@ -37,7 +38,65 @@ public class AuthController : ControllerBase
             return Unauthorized();
 
         var token = GenerateToken(user);
-        return Ok(new { token, role = user.Role.Name });
+        return Ok(new { token, role = user.Role.Name, fullName = user.FullName, email = user.Email });
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public IActionResult GetMe()
+    {
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        var user = _context.Users.Include(u => u.Role).FirstOrDefault(u => u.Id == userId);
+        if (user == null) return NotFound("User not found");
+
+        return Ok(new
+        {
+            user.Id,
+            user.Email,
+            user.FullName,
+            Role = user.Role.Name,
+            user.IsActive,
+            user.CreatedAt
+        });
+    }
+
+    [Authorize]
+    [HttpPut("profile")]
+    public IActionResult UpdateProfile([FromBody] UpdateProfileDto dto)
+    {
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+        if (user == null) return NotFound("User not found");
+
+        if (!dto.Email.EndsWith("@example.com"))
+        {
+            return BadRequest("Email phải có đuôi @example.com");
+        }
+
+        if (user.Email != dto.Email && _context.Users.Any(u => u.Email == dto.Email && u.Id != userId))
+        {
+            return BadRequest("Email đã được sử dụng bởi người khác.");
+        }
+
+        user.FullName = dto.FullName;
+        user.Email = dto.Email;
+
+        if (!string.IsNullOrEmpty(dto.NewPassword))
+        {
+            if (string.IsNullOrEmpty(dto.CurrentPassword) || !BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.PasswordHash))
+            {
+                return BadRequest("Mật khẩu hiện tại không đúng.");
+            }
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+        }
+
+        _context.SaveChanges();
+
+        return Ok(new { message = "Cập nhật hồ sơ thành công." });
     }
 
     private string GenerateToken(User user)

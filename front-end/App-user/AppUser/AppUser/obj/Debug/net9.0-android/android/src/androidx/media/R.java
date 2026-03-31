@@ -8,30 +8,30 @@ package androidx.media;
 
 public final class R {
 	public static final class color {
-		public static final int notification_material_background_media_default_color = 0x7f060300;
-		public static final int primary_text_default_material_dark = 0x7f060305;
-		public static final int secondary_text_default_material_dark = 0x7f06030b;
+		public static final int notification_material_background_media_default_color = 0x7f06030b;
+		public static final int primary_text_default_material_dark = 0x7f060310;
+		public static final int secondary_text_default_material_dark = 0x7f060316;
 	}
 	public static final class id {
 		public static final int action0 = 0x7f0a0031;
 		public static final int action_divider = 0x7f0a003e;
-		public static final int cancel_action = 0x7f0a0073;
-		public static final int chronometer = 0x7f0a0080;
-		public static final int end_padder = 0x7f0a00c0;
-		public static final int icon = 0x7f0a011e;
-		public static final int info = 0x7f0a0127;
-		public static final int line1 = 0x7f0a0134;
-		public static final int line3 = 0x7f0a0135;
-		public static final int media_actions = 0x7f0a0156;
-		public static final int media_controller_compat_view_tag = 0x7f0a0157;
-		public static final int notification_main_column = 0x7f0a0192;
-		public static final int notification_main_column_container = 0x7f0a0193;
-		public static final int right_side = 0x7f0a01c3;
-		public static final int status_bar_latest_event_content = 0x7f0a0203;
-		public static final int text = 0x7f0a021a;
-		public static final int text2 = 0x7f0a021b;
-		public static final int time = 0x7f0a022b;
-		public static final int title = 0x7f0a022c;
+		public static final int cancel_action = 0x7f0a0075;
+		public static final int chronometer = 0x7f0a0082;
+		public static final int end_padder = 0x7f0a00c3;
+		public static final int icon = 0x7f0a0123;
+		public static final int info = 0x7f0a012d;
+		public static final int line1 = 0x7f0a013b;
+		public static final int line3 = 0x7f0a013c;
+		public static final int media_actions = 0x7f0a015d;
+		public static final int media_controller_compat_view_tag = 0x7f0a015e;
+		public static final int notification_main_column = 0x7f0a0199;
+		public static final int notification_main_column_container = 0x7f0a019a;
+		public static final int right_side = 0x7f0a01ca;
+		public static final int status_bar_latest_event_content = 0x7f0a020b;
+		public static final int text = 0x7f0a0223;
+		public static final int text2 = 0x7f0a0224;
+		public static final int time = 0x7f0a0234;
+		public static final int title = 0x7f0a0235;
 	}
 	public static final class integer {
 		public static final int cancel_button_image_alpha = 0x7f0b0004;

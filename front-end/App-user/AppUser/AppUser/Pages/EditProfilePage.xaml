@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AppUser.Pages.EditProfilePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AppUser.ViewModels"
+    Title="Chỉnh sửa hồ sơ"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="{StaticResource Background}">
+    
+    <Grid RowDefinitions="Auto,*">
+        <!-- ── HEADER ── -->
+        <Border Grid.Row="0" Margin="0,-20,0,0" StrokeThickness="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="0,0,32,32" />
+            </Border.StrokeShape>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="{StaticResource Primary}" Offset="0.0" />
+                    <GradientStop Color="{StaticResource PrimaryDark}" Offset="1.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid ColumnDefinitions="Auto,*" Padding="16,32,16,32">
+                <Border Grid.Column="0" BackgroundColor="#40000000" StrokeShape="RoundRectangle 20" StrokeThickness="0" WidthRequest="40" HeightRequest="40" VerticalOptions="Center">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding CancelCommand}"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="✕" TextColor="White" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Border>
+                <Label Grid.Column="1" Text="Chỉnh sửa hồ sơ" FontFamily="PoppinsBold" FontSize="20" TextColor="White" VerticalOptions="Center" HorizontalOptions="Center" Margin="-40,0,0,0"/>
+            </Grid>
+        </Border>
+
+        <ScrollView Grid.Row="1" Margin="0,-20,0,0">
+            <VerticalStackLayout Padding="20">
+                
+                <Border BackgroundColor="{StaticResource Surface}" StrokeShape="RoundRectangle 24" StrokeThickness="0" Padding="24">
+                    <Border.Shadow>
+                        <Shadow Brush="#10000000" Offset="0,8" Radius="16" Opacity="0.5"/>
+                    </Border.Shadow>
+                    
+                    <VerticalStackLayout Spacing="20">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Họ và tên" FontFamily="PoppinsSemiBold" FontSize="14" TextColor="{StaticResource TextPrimary}" />
+                            <Border StrokeShape="RoundRectangle 12" Stroke="{StaticResource Border}" StrokeThickness="1" BackgroundColor="{StaticResource SurfaceVariant}" Padding="16,4">
+                                <Entry Text="{Binding FullName}" FontFamily="PoppinsRegular" Placeholder="Nhập họ và tên" BackgroundColor="Transparent" TextColor="{StaticResource TextPrimary}" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Email (* @example.com)" FontFamily="PoppinsSemiBold" FontSize="14" TextColor="{StaticResource TextPrimary}" />
+                            <Border StrokeShape="RoundRectangle 12" Stroke="{StaticResource Border}" StrokeThickness="1" BackgroundColor="{StaticResource SurfaceVariant}" Padding="16,4">
+                                <Entry Text="{Binding Email}" FontFamily="PoppinsRegular" Placeholder="example@example.com" Keyboard="Email" BackgroundColor="Transparent" TextColor="{StaticResource TextPrimary}" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Mật khẩu hiện tại" FontFamily="PoppinsSemiBold" FontSize="14" TextColor="{StaticResource TextPrimary}" />
+                            <Border StrokeShape="RoundRectangle 12" Stroke="{StaticResource Border}" StrokeThickness="1" BackgroundColor="{StaticResource SurfaceVariant}" Padding="16,4">
+                                <Entry Text="{Binding CurrentPassword}" IsPassword="True" Placeholder="Nhập mật khẩu hiện tại" FontFamily="PoppinsRegular" BackgroundColor="Transparent" TextColor="{StaticResource TextPrimary}" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Mật khẩu mới (Tuỳ chọn)" FontFamily="PoppinsSemiBold" FontSize="14" TextColor="{StaticResource TextPrimary}" />
+                            <Border StrokeShape="RoundRectangle 12" Stroke="{StaticResource Border}" StrokeThickness="1" BackgroundColor="{StaticResource SurfaceVariant}" Padding="16,4">
+                                <Entry Text="{Binding NewPassword}" IsPassword="True" Placeholder="Nhập mật khẩu mới" FontFamily="PoppinsRegular" BackgroundColor="Transparent" TextColor="{StaticResource TextPrimary}" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <Label Text="{Binding ErrorMessage}"
+                               IsVisible="{Binding ErrorMessage, Converter={StaticResource StringIsNotNullOrEmptyConverter}}"
+                               TextColor="Red"
+                               FontFamily="PoppinsMedium" FontSize="12"
+                               HorizontalOptions="Center" />
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ── SAVE BUTTON ── -->
+                <Border StrokeShape="RoundRectangle 16"
+                        StrokeThickness="0"
+                        Margin="0,32,0,16"
+                        HeightRequest="56">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="{StaticResource Primary}" Offset="0.0" />
+                            <GradientStop Color="{StaticResource PrimaryDark}" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Border.Shadow>
+                        <Shadow Brush="{StaticResource PrimaryDark}" Offset="0,8" Radius="16" Opacity="0.4"/>
+                    </Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SaveCommand}" />
+                    </Border.GestureRecognizers>
+                    <Grid>
+                        <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8" IsVisible="{Binding IsBusy, Converter={StaticResource BoolInverterConverter}}">
+                            <Label Text="💾" FontSize="20" TextColor="White" VerticalOptions="Center"/>
+                            <Label Text="Lưu thay đổi" FontFamily="PoppinsBold" FontSize="16" TextColor="White" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Grid>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

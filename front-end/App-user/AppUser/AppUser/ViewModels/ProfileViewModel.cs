@@ -31,7 +31,20 @@ namespace AppUser.ViewModels
 
         public void Initialize()
         {
-            CurrentUser = _authService.GetCurrentUser();
+            var user = _authService.GetCurrentUser();
+            if (user != null)
+            {
+                // Re-assign to force PropertyChanged
+                CurrentUser = new UserDto
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FullName = user.FullName,
+                    Role = user.Role,
+                    IsActive = user.IsActive,
+                    CreatedAt = user.CreatedAt
+                };
+            }
             LoadHistory();
             UpdateLanguageDisplay();
         }
@@ -65,6 +78,12 @@ namespace AppUser.ViewModels
 
             await _authService.LogoutAsync();
             await Shell.Current.GoToAsync("//login");
+        }
+
+        [RelayCommand]
+        private async Task GoToEditProfileAsync()
+        {
+            await Shell.Current.GoToAsync("editProfile");
         }
 
         [RelayCommand]

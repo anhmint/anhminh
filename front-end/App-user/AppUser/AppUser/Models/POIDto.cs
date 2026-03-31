@@ -16,6 +16,10 @@ namespace AppUser.Models
         public int Id { get; set; }
         public string? ImageUrl { get; set; }
         public string? Location { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
+        public Microsoft.Maui.Devices.Sensors.Location? LocationObj =>
+            (Latitude.HasValue && Longitude.HasValue) ? new Microsoft.Maui.Devices.Sensors.Location(Latitude.Value, Longitude.Value) : null;
         public List<POITranslationDto> Translations { get; set; } = new();
         public ShopDto? Shop { get; set; }
         public List<AudioGuideDto> AudioGuides { get; set; } = new();

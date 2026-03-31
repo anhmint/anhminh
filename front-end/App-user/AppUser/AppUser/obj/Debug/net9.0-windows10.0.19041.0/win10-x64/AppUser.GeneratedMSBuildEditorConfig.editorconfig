@@ -53,6 +53,12 @@ build_metadata.AdditionalFiles.ManifestResourceName = AppUser.Pages.AudioPlayerP
 build_metadata.AdditionalFiles.TargetPath = Pages\AudioPlayerPage.xaml
 build_metadata.AdditionalFiles.RelativePath = Pages\AudioPlayerPage.xaml
 
+[C:/C\# Project/poi-backend-api/front-end/App-user/AppUser/AppUser/Pages/EditProfilePage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = AppUser.Pages.EditProfilePage.xaml
+build_metadata.AdditionalFiles.TargetPath = Pages\EditProfilePage.xaml
+build_metadata.AdditionalFiles.RelativePath = Pages\EditProfilePage.xaml
+
 [C:/C\# Project/poi-backend-api/front-end/App-user/AppUser/AppUser/Pages/HomePage.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = AppUser.Pages.HomePage.xaml

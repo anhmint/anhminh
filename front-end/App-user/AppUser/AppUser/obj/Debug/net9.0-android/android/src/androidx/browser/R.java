@@ -18,21 +18,21 @@ public final class R {
 		public static final int browser_actions_context_menu_min_padding = 0x7f070053;
 	}
 	public static final class id {
-		public static final int browser_actions_header_text = 0x7f0a006b;
-		public static final int browser_actions_menu_item_icon = 0x7f0a006c;
-		public static final int browser_actions_menu_item_text = 0x7f0a006d;
-		public static final int browser_actions_menu_items = 0x7f0a006e;
-		public static final int browser_actions_menu_view = 0x7f0a006f;
+		public static final int browser_actions_header_text = 0x7f0a006d;
+		public static final int browser_actions_menu_item_icon = 0x7f0a006e;
+		public static final int browser_actions_menu_item_text = 0x7f0a006f;
+		public static final int browser_actions_menu_items = 0x7f0a0070;
+		public static final int browser_actions_menu_view = 0x7f0a0071;
 	}
 	public static final class layout {
 		public static final int browser_actions_context_menu_page = 0x7f0d001c;
 		public static final int browser_actions_context_menu_row = 0x7f0d001d;
 	}
 	public static final class string {
-		public static final int copy_toast_msg = 0x7f11002e;
-		public static final int fallback_menu_item_copy_link = 0x7f11006d;
-		public static final int fallback_menu_item_open_in_browser = 0x7f11006e;
-		public static final int fallback_menu_item_share_link = 0x7f11006f;
+		public static final int copy_toast_msg = 0x7f110040;
+		public static final int fallback_menu_item_copy_link = 0x7f11007f;
+		public static final int fallback_menu_item_open_in_browser = 0x7f110080;
+		public static final int fallback_menu_item_share_link = 0x7f110081;
 	}
 	public static final class xml {
 		public static final int image_share_filepaths = 0x7f140000;

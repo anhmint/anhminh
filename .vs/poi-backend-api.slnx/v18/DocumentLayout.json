@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\C# Project\\poi-backend-api\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{1443AEA7-45DE-606E-9384-AF9028B3204E}|front-end\\foodstreet-admin\\foodstreet-admin\\foodstreet-admin.csproj|c:\\c# project\\poi-backend-api\\front-end\\foodstreet-admin\\foodstreet-admin\\components\\layout\\sellerlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{1443AEA7-45DE-606E-9384-AF9028B3204E}|front-end\\foodstreet-admin\\foodstreet-admin\\foodstreet-admin.csproj|solutionrelative:front-end\\foodstreet-admin\\foodstreet-admin\\components\\layout\\sellerlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{1443AEA7-45DE-606E-9384-AF9028B3204E}|front-end\\foodstreet-admin\\foodstreet-admin\\foodstreet-admin.csproj|c:\\c# project\\poi-backend-api\\front-end\\foodstreet-admin\\foodstreet-admin\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{1443AEA7-45DE-606E-9384-AF9028B3204E}|front-end\\foodstreet-admin\\foodstreet-admin\\foodstreet-admin.csproj|solutionrelative:front-end\\foodstreet-admin\\foodstreet-admin\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -41,10 +45,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{1443AEA7-45DE-606E-9384-AF9028B3204E}|front-end\\foodstreet-admin\\foodstreet-admin\\foodstreet-admin.csproj|c:\\c# project\\poi-backend-api\\front-end\\foodstreet-admin\\foodstreet-admin\\components\\pages\\appmap.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{1443AEA7-45DE-606E-9384-AF9028B3204E}|front-end\\foodstreet-admin\\foodstreet-admin\\foodstreet-admin.csproj|solutionrelative:front-end\\foodstreet-admin\\foodstreet-admin\\components\\pages\\appmap.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{1443AEA7-45DE-606E-9384-AF9028B3204E}|front-end\\foodstreet-admin\\foodstreet-admin\\foodstreet-admin.csproj|c:\\c# project\\poi-backend-api\\front-end\\foodstreet-admin\\foodstreet-admin\\components\\layout\\sellerlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{1443AEA7-45DE-606E-9384-AF9028B3204E}|front-end\\foodstreet-admin\\foodstreet-admin\\foodstreet-admin.csproj|solutionrelative:front-end\\foodstreet-admin\\foodstreet-admin\\components\\layout\\sellerlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{1443AEA7-45DE-606E-9384-AF9028B3204E}|front-end\\foodstreet-admin\\foodstreet-admin\\foodstreet-admin.csproj|c:\\c# project\\poi-backend-api\\front-end\\foodstreet-admin\\foodstreet-admin\\components\\pages\\seller\\stats.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -186,11 +186,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 0,
               "Title": "SellerLayout.razor",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\front-end\\foodstreet-admin\\foodstreet-admin\\Components\\Layout\\SellerLayout.razor",
               "RelativeDocumentMoniker": "front-end\\foodstreet-admin\\foodstreet-admin\\Components\\Layout\\SellerLayout.razor",
@@ -198,11 +198,12 @@
               "RelativeToolTip": "front-end\\foodstreet-admin\\foodstreet-admin\\Components\\Layout\\SellerLayout.razor",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-03-24T17:46:18.736Z"
+              "WhenOpened": "2026-03-24T17:46:18.736Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "DashBoard.razor",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\front-end\\foodstreet-admin\\foodstreet-admin\\Components\\Pages\\Seller\\DashBoard.razor",
               "RelativeDocumentMoniker": "front-end\\foodstreet-admin\\foodstreet-admin\\Components\\Pages\\Seller\\DashBoard.razor",
@@ -210,8 +211,7 @@
               "RelativeToolTip": "front-end\\foodstreet-admin\\foodstreet-admin\\Components\\Pages\\Seller\\DashBoard.razor",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAABRAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-03-24T06:07:46.121Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-24T06:07:46.121Z"
             },
             {
               "$type": "Document",
@@ -251,7 +251,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "Profile.razor",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\front-end\\foodstreet-admin\\foodstreet-admin\\Components\\Pages\\Seller\\Profile.razor",
               "RelativeDocumentMoniker": "front-end\\foodstreet-admin\\foodstreet-admin\\Components\\Pages\\Seller\\Profile.razor",
@@ -263,20 +263,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\front-end\\foodstreet-admin\\foodstreet-admin\\Program.cs",
               "RelativeDocumentMoniker": "front-end\\foodstreet-admin\\foodstreet-admin\\Program.cs",
               "ToolTip": "C:\\C# Project\\poi-backend-api\\front-end\\foodstreet-admin\\foodstreet-admin\\Program.cs",
               "RelativeToolTip": "front-end\\foodstreet-admin\\foodstreet-admin\\Program.cs",
-              "ViewState": "AgIAAGAAAAAAAAAAAAAAAGoAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAAAHQAAABJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-23T16:10:02.275Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-23T16:10:02.275Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "DashBoard.razor",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\front-end\\foodstreet-admin\\foodstreet-admin\\Components\\Pages\\Admin\\DashBoard.razor",
               "RelativeDocumentMoniker": "front-end\\foodstreet-admin\\foodstreet-admin\\Components\\Pages\\Admin\\DashBoard.razor",
@@ -288,7 +287,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "MyStore.razor",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\front-end\\foodstreet-admin\\foodstreet-admin\\Components\\Pages\\Seller\\MyStore.razor",
               "RelativeDocumentMoniker": "front-end\\foodstreet-admin\\foodstreet-admin\\Components\\Pages\\Seller\\MyStore.razor",
@@ -300,7 +299,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "foodstreet-admin.csproj",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\front-end\\foodstreet-admin\\foodstreet-admin\\foodstreet-admin.csproj",
               "RelativeDocumentMoniker": "front-end\\foodstreet-admin\\foodstreet-admin\\foodstreet-admin.csproj",
@@ -308,12 +307,11 @@
               "RelativeToolTip": "front-end\\foodstreet-admin\\foodstreet-admin\\foodstreet-admin.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-03-23T14:51:16.707Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-23T14:51:16.707Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "AppMap.razor",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\front-end\\foodstreet-admin\\foodstreet-admin\\Components\\Pages\\AppMap.razor",
               "RelativeDocumentMoniker": "front-end\\foodstreet-admin\\foodstreet-admin\\Components\\Pages\\AppMap.razor",
@@ -325,7 +323,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "POITranslation.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Models\\POITranslation.cs",
               "RelativeDocumentMoniker": "backend\\PoiApi\\Models\\POITranslation.cs",
@@ -337,7 +335,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "MenusController.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\backend\\PoiApi\\Controllers\\Owner\\MenusController.cs",
               "RelativeDocumentMoniker": "backend\\PoiApi\\Controllers\\Owner\\MenusController.cs",
@@ -541,7 +539,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "RegisterRequest.cs",
               "DocumentMoniker": "C:\\C# Project\\poi-backend-api\\front-end\\foodstreet-admin\\foodstreet-admin\\Models\\RegisterRequest.cs",
               "RelativeDocumentMoniker": "front-end\\foodstreet-admin\\foodstreet-admin\\Models\\RegisterRequest.cs",
