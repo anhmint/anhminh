@@ -11,6 +11,9 @@ namespace AppUser.ViewModels
         private readonly POIService _poiService;
         private readonly AudioService _audioService;
         private List<POIDto> _allPOIs = new();
+        
+        private IDispatcherTimer? _locationTimer;
+        private readonly HashSet<int> _notifiedPoiIds = new();
 
         [ObservableProperty]
         private ObservableCollection<POIDto> filteredPOIs = new();
@@ -25,6 +28,12 @@ namespace AppUser.ViewModels
         private bool isEmpty = false;
 
         [ObservableProperty]
+        private bool isMapView = false;
+
+        [ObservableProperty]
+        private Location? userLocation;
+
+        [ObservableProperty]
         private string currentLanguage = "vi";
 
         public POIListViewModel(POIService poi, AudioService audio)
@@ -37,6 +46,102 @@ namespace AppUser.ViewModels
         public async Task InitializeAsync()
         {
             await LoadAllPOIsAsync();
+            await RequestLocationPermissionAsync();
+            StartLocationTracking();
+        }
+
+        private void StartLocationTracking()
+        {
+            if (_locationTimer != null) return;
+            
+            _locationTimer = Application.Current!.Dispatcher.CreateTimer();
+            _locationTimer.Interval = TimeSpan.FromSeconds(10); // check every 10 seconds
+            _locationTimer.Tick += async (s, e) => await CheckProximityAsync();
+            _locationTimer.Start();
+        }
+
+        public void StopTracking()
+        {
+            _locationTimer?.Stop();
+            _locationTimer = null;
+        }
+
+        private async Task CheckProximityAsync()
+        {
+            if (UserLocation == null || _allPOIs.Count == 0) return;
+
+            try
+            {
+                var loc = await Geolocation.Default.GetLocationAsync(new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(5)));
+                if (loc != null) UserLocation = loc;
+            }
+            catch { /* Ignore */ }
+
+            if (UserLocation == null) return;
+
+            // Find nearest POI within 100 meters
+            var nearestPoi = _allPOIs
+                .Where(p => p.Latitude.HasValue && p.Longitude.HasValue && !_notifiedPoiIds.Contains(p.Id))
+                .Select(p => new 
+                { 
+                    Poi = p, 
+                    Distance = Location.CalculateDistance(
+                        UserLocation.Latitude, UserLocation.Longitude, 
+                        p.Latitude!.Value, p.Longitude!.Value, 
+                        DistanceUnits.Kilometers) * 1000 // meters
+                })
+                .Where(x => x.Distance <= 100) // Within 100 meters
+                .OrderBy(x => x.Distance)
+                .FirstOrDefault();
+
+            if (nearestPoi != null)
+            {
+                _notifiedPoiIds.Add(nearestPoi.Poi.Id);
+                
+                // Prompt user
+                Application.Current?.Dispatcher.Dispatch(async () =>
+                {
+                    bool wantToListen = await Shell.Current.DisplayAlert(
+                        "Điểm ẩm thực gần bạn!",
+                        $"Bạn đang ở rất gần {nearestPoi.Poi.Shop?.Name}. Bạn có muốn nghe thuyết minh không?",
+                        "Nghe ngay",
+                        "Bỏ qua"
+                    );
+
+                    if (wantToListen)
+                    {
+                        await NavigateToPOIAsync(nearestPoi.Poi);
+                    }
+                });
+            }
+        }
+
+        private async Task RequestLocationPermissionAsync()
+        {
+            try
+            {
+                var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+                if (status != PermissionStatus.Granted)
+                {
+                    status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+                }
+                
+                if (status == PermissionStatus.Granted)
+                {
+                    UserLocation = await Geolocation.Default.GetLastKnownLocationAsync()
+                                ?? await Geolocation.Default.GetLocationAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting location: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        private void ToggleView()
+        {
+            IsMapView = !IsMapView;
         }
 
         [RelayCommand]

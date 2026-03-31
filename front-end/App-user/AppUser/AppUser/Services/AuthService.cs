@@ -36,9 +36,11 @@ namespace AppUser.Services
                     if (result != null)
                     {
                         _token = result.Token;
+                        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
                         _currentUser = new UserDto
                         {
-                            Email = email,
+                            Email = result.Email ?? email,
+                            FullName = result.FullName ?? string.Empty,
                             Role = result.Role,
                             IsActive = true
                         };
@@ -88,10 +90,46 @@ namespace AppUser.Services
             }
         }
 
+        public async Task<(bool Success, string Message)> UpdateProfileAsync(string email, string fullName, string? currentPassword, string? newPassword)
+        {
+            if (_token == null) return (false, "Chưa đăng nhập.");
+            
+            try
+            {
+                var payload = new 
+                {
+                    Email = email.Trim(),
+                    FullName = fullName.Trim(),
+                    CurrentPassword = currentPassword,
+                    NewPassword = newPassword
+                };
+
+                var response = await _httpClient.PutAsJsonAsync("/api/auth/profile", payload);
+                if (response.IsSuccessStatusCode)
+                {
+                    if (_currentUser != null)
+                    {
+                        _currentUser.FullName = payload.FullName;
+                        _currentUser.Email = payload.Email;
+                    }
+                    return (true, "Cập nhật hồ sơ thành công!");
+                }
+                
+                var errorMsg = await response.Content.ReadAsStringAsync();
+                return (false, !string.IsNullOrWhiteSpace(errorMsg) ? errorMsg : "Cập nhật thất bại.");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Update profile error: {ex.Message}");
+                return (false, "Không thể kết nối đến máy chủ.");
+            }
+        }
+
         public Task LogoutAsync()
         {
             _currentUser = null;
             _token = null;
+            _httpClient.DefaultRequestHeaders.Authorization = null;
             // SecureStorage.Default.Remove("auth_token");
             return Task.CompletedTask;
         }
@@ -102,6 +140,8 @@ namespace AppUser.Services
         {
             public string Token { get; set; } = string.Empty;
             public string Role { get; set; } = string.Empty;
+            public string? FullName { get; set; }
+            public string? Email { get; set; }
         }
     }
 }

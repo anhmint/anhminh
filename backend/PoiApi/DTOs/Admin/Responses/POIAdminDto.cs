@@ -1,4 +1,4 @@
-﻿namespace PoiApi.DTOs.Admin.Responses;
+namespace PoiApi.DTOs.Admin.Responses;
 
 public class POIAdminDto
 {
@@ -7,4 +7,6 @@ public class POIAdminDto
     public string Description { get; set; } = String.Empty;
     public string ImageUrl { get; set; } = String.Empty;
     public string Location { get; set; } = String.Empty;
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
 }

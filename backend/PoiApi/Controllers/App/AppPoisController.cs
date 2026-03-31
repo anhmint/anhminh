@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using PoiApi.Data;
 using PoiApi.DTOs.App;
@@ -34,6 +34,9 @@ public class AppPoisController : ControllerBase
             {
                 Id = p.Id,
                 ImageUrl = p.ImageUrl,
+                Location = p.Location,
+                Latitude = p.Latitude,
+                Longitude = p.Longitude,
                 Name = t.Name
             };
         });
@@ -63,6 +66,8 @@ public class AppPoisController : ControllerBase
             Id = poi.Id,
             ImageUrl = poi.ImageUrl,
             Location = poi.Location,
+            Latitude = poi.Latitude,
+            Longitude = poi.Longitude,
             Name = t.Name,
             Description = t.Description,
             Menus = poi.Menus.Select(m => new AppMenuDto

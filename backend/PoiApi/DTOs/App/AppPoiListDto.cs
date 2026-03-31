@@ -1,4 +1,4 @@
-﻿namespace PoiApi.DTOs.App
+namespace PoiApi.DTOs.App
 {
     public class AppPoiListDto
     {
@@ -6,5 +6,7 @@
         public string Name { get; set; } = null!;
         public string ImageUrl { get; set; } = null!;
         public string Location { get; set; } = null!;
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
     }
 }

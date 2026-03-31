@@ -21,10 +21,14 @@
         <VerticalStackLayout Spacing="0">
 
             <!-- ── PROFILE HEADER ── -->
-            <VerticalStackLayout BackgroundColor="{StaticResource Primary}"
-                                  Padding="24,16,24,40"
-                                  Spacing="12"
-                                  HorizontalOptions="Fill">
+            <Border StrokeThickness="0" Margin="0,-20,0,0" Padding="24,40,24,48">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="{StaticResource Primary}" Offset="0" />
+                        <GradientStop Color="{StaticResource PrimaryDark}" Offset="1" />
+                    </LinearGradientBrush>
+                </Border.Background>
+                <VerticalStackLayout Spacing="12" HorizontalOptions="Fill">
 
                 <!-- Avatar -->
                 <Border BackgroundColor="White"
@@ -40,10 +44,24 @@
                 </Border>
 
                 <!-- User info -->
-                <Label Text="{Binding CurrentUser.Email}"
+                <Label Text="{Binding CurrentUser.FullName}"
                        Style="{StaticResource TitleLarge}"
                        TextColor="White"
                        HorizontalOptions="Center"/>
+                <Label Text="{Binding CurrentUser.Email}"
+                       Style="{StaticResource BodyMedium}"
+                       TextColor="#DDFFFFFF"
+                       HorizontalOptions="Center"/>
+
+                <Button Text="✏️ Chỉnh sửa hồ sơ"
+                        Command="{Binding GoToEditProfileCommand}"
+                        BackgroundColor="#25FFFFFF"
+                        TextColor="White"
+                        CornerRadius="20"
+                        HeightRequest="40"
+                        HorizontalOptions="Center"
+                        Padding="16,0"
+                        Margin="0,8,0,0"/>
 
                 <Border BackgroundColor="#25FFFFFF"
                         StrokeShape="RoundRectangle 12"
@@ -113,16 +131,16 @@
                            Margin="0,0,0,12"/>
 
                     <Border BackgroundColor="{StaticResource SurfaceVariant}"
-                            StrokeShape="RoundRectangle 14"
+                            StrokeShape="RoundRectangle 16"
                             StrokeThickness="0"
                             Padding="16,14">
                         <Grid ColumnDefinitions="Auto,*,Auto">
-                            <Label Grid.Column="0" Text="🌐" FontSize="22" VerticalOptions="Center" Margin="0,0,12,0"/>
-                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                            <Label Grid.Column="0" Text="🌐" FontSize="24" VerticalOptions="Center" Margin="0,0,16,0"/>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
                                 <Label Text="Ngôn ngữ thuyết minh"
-                                       Style="{StaticResource TitleMedium}"/>
+                                       FontFamily="PoppinsBold" FontSize="15" TextColor="{StaticResource TextPrimary}"/>
                                 <Label Text="{Binding CurrentLanguageDisplay}"
-                                       Style="{StaticResource BodySmall}"/>
+                                       FontFamily="PoppinsRegular" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
                             </VerticalStackLayout>
                             <Switch Grid.Column="2"
                                     OnColor="{StaticResource Primary}"
@@ -131,7 +149,6 @@
                                     Toggled="OnLanguageToggled"/>
                         </Grid>
                     </Border>
-
                 </VerticalStackLayout>
             </Border>
 
@@ -165,35 +182,35 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Border BackgroundColor="{StaticResource Surface}"
-                                    StrokeShape="RoundRectangle 12"
+                                    StrokeShape="RoundRectangle 16"
                                     StrokeThickness="0"
-                                    Margin="0,4"
-                                    Padding="14,12">
+                                    Margin="0,6,0,8"
+                                    Padding="16,14">
                                 <Border.Shadow>
-                                    <Shadow Brush="#10000000" Offset="0,1" Radius="4" Opacity="0.1"/>
+                                    <Shadow Brush="#10000000" Offset="0,4" Radius="8" Opacity="0.5"/>
                                 </Border.Shadow>
-                                <Grid ColumnDefinitions="56,*,Auto">
+                                <Grid ColumnDefinitions="64,*,Auto">
                                     <!-- Thumbnail -->
                                     <Border Grid.Column="0"
-                                            StrokeShape="RoundRectangle 10"
+                                            StrokeShape="RoundRectangle 12"
                                             StrokeThickness="0"
-                                            WidthRequest="56" HeightRequest="56">
+                                            WidthRequest="64" HeightRequest="64">
                                         <Image Source="{Binding POI.ImageUrl}"
                                                Aspect="AspectFill"
-                                               WidthRequest="56" HeightRequest="56"/>
+                                               WidthRequest="64" HeightRequest="64"/>
                                     </Border>
 
                                     <!-- Info -->
                                     <VerticalStackLayout Grid.Column="1"
-                                                         Padding="12,0"
+                                                         Padding="16,0"
                                                          VerticalOptions="Center"
-                                                         Spacing="3">
+                                                         Spacing="4">
                                         <Label Text="{Binding POI.Shop.Name}"
-                                               Style="{StaticResource TitleMedium}"
+                                               FontFamily="PoppinsBold" FontSize="16" TextColor="{StaticResource TextPrimary}"
                                                LineBreakMode="TailTruncation"
                                                MaxLines="1"/>
                                         <Label Text="{Binding POI.Location}"
-                                               Style="{StaticResource BodySmall}"
+                                               FontFamily="PoppinsRegular" FontSize="13" TextColor="{StaticResource TextSecondary}"
                                                LineBreakMode="TailTruncation"
                                                MaxLines="1"/>
                                     </VerticalStackLayout>
@@ -201,9 +218,11 @@
                                     <!-- Arrow -->
                                     <Label Grid.Column="2"
                                            Text="›"
-                                           FontSize="22"
+                                           FontFamily="PoppinsBold"
+                                           FontSize="26"
                                            TextColor="{StaticResource TextHint}"
-                                           VerticalOptions="Center"/>
+                                           VerticalOptions="Center"
+                                           Margin="0,0,8,0"/>
                                 </Grid>
                             </Border>
                         </DataTemplate>
