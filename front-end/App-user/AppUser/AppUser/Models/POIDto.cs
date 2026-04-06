@@ -31,9 +31,9 @@ namespace AppUser.Models
             ?? Translations.FirstOrDefault();
 
         public string DisplayName(string lang = "vi")
-            => GetTranslation(lang)?.Name ?? $"POI #{Id}";
+            => GetTranslation(lang)?.Name ?? Shop?.Name ?? $"POI #{Id}";
 
         public string DisplayDescription(string lang = "vi")
-            => GetTranslation(lang)?.Description ?? string.Empty;
+            => GetTranslation(lang)?.Description ?? Shop?.Description ?? string.Empty;
     }
 }

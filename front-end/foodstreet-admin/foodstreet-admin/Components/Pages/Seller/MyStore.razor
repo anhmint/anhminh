@@ -104,18 +104,26 @@
                             <MudText Typo="Typo.body2" Style="opacity:0.7">@store.Address</MudText>
                         </div>
                         
-                        @if (!string.IsNullOrEmpty(store.AudioUrl))
+                        @if (store.AudioUrls != null && store.AudioUrls.Any(x => !string.IsNullOrEmpty(x.Value)))
                         {
                             <MudPaper Class="pa-3 mt-4" Elevation="0" Style="background: rgba(99,102,241,0.05); border-radius:12px">
                                 <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-1">
                                     <MudIcon Icon="@Icons.Material.Filled.RecordVoiceOver" Size="Size.Small" Color="Color.Primary" />
                                     <MudText Typo="Typo.caption" Color="Color.Primary" Style="font-weight:700">Audio Guide</MudText>
                                 </MudStack>
-                                <audio @key="@($"audio-{store.Id}-{store.AudioUrl}")" 
-                                       src="@ResolveAudioUrl(store.AudioUrl)" 
-                                       controls preload="auto" 
-                                       style="width: 100%; height: 32px; filter: grayscale(1) opacity(0.8)">
-                                </audio>
+                                @foreach (var aud in store.AudioUrls.Where(x => !string.IsNullOrEmpty(x.Value)))
+                                {
+                                    <div class="d-flex align-center mt-1">
+                                        <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Text" Style="min-width: 80px; font-weight: bold; padding: 0;">
+                                            @GetLangDisplayName(aud.Key)
+                                        </MudChip>
+                                        <audio @key="@($"audio-{store.Id}-{aud.Key}-{aud.Value}")" 
+                                               src="@ResolveAudioUrl(aud.Value)" 
+                                               controls preload="none" 
+                                               style="width: 100%; height: 32px; filter: grayscale(1) opacity(0.8)">
+                                        </audio>
+                                    </div>
+                                }
                             </MudPaper>
                         }
                     </MudStack>
@@ -262,7 +270,7 @@
 
             <MudItem xs="12">
                 <MudDivider Class="my-2" />
-                <MudText Typo="Typo.subtitle2" Class="mb-2" Style="font-weight:600">
+                <MudText Typo="Typo.subtitle2" Class="mb-3" Style="font-weight:600">
                     <MudIcon Icon="@Icons.Material.Filled.RecordVoiceOver" Size="Size.Small" Class="mr-1" />
                     Giọng thuyết minh (TTS)
                 </MudText>
@@ -276,28 +284,77 @@
                 else
                 {
                     <MudTextField @bind-Value="_form.Description" Label="Nội dung thuyết minh (TTS)"
-                                  Variant="Variant.Outlined" Lines="3" Class="mb-2"
-                                  HelperText="Nội dung này sẽ được chuyển thành giọng nói và ĐƯỢC LƯU vào mô tả quán. Bạn có thể chỉnh sửa tùy ý." />
-                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
-                        <MudSelect @bind-Value="_selectedTtsLang" Label="Ngôn ngữ thuyết minh" Variant="Variant.Outlined" dense="true" Style="max-width: 200px;">
-                            @foreach (var lang in _supportedLangs)
-                            {
-                                <MudSelectItem Value="@lang.Code">@lang.Name</MudSelectItem>
-                            }
-                        </MudSelect>
-                        <MudButton Variant="Variant.Filled" Color="Color.Info"
-                                   OnClick="GenerateTTS" Disabled="@(_generatingTts || string.IsNullOrWhiteSpace(_form.Description))">
+                                  Variant="Variant.Outlined" Lines="3" Class="mb-3"
+                                  HelperText="Nội dung này sẽ được chuyển thành giọng nói. Hệ thống tự động dịch sang ngôn ngữ bạn chọn." />
+
+                    @* ── Language Chips ── *@
+                    <MudText Typo="Typo.caption" Class="mb-2" Style="opacity:0.7">Chọn ngôn ngữ cần tạo:</MudText>
+                    <MudStack Row="true" Spacing="2" Class="mb-3" AlignItems="AlignItems.Center">
+                        @foreach (var lang in _supportedLangs)
+                        {
+                            var isSelected = _selectedTtsLang == lang.Code;
+                            <MudChip T="string" 
+                                     Color="@(isSelected ? Color.Primary : Color.Default)" 
+                                     Variant="@(isSelected ? Variant.Filled : Variant.Outlined)"
+                                     OnClick="@(() => SelectLang(lang.Code))"
+                                     Icon="@(isSelected ? Icons.Material.Filled.RadioButtonChecked : Icons.Material.Filled.RadioButtonUnchecked)"
+                                     Style="@(isSelected ? "font-weight:700" : "")">
+                                @lang.Name
+                            </MudChip>
+                        }
+                        
+                        @if (_selectedTtsLang != "vi")
+                        {
+                            <MudButton Variant="Variant.Filled" 
+                                       Color="Color.Info" 
+                                       Size="Size.Medium" 
+                                       StartIcon="@Icons.Material.Filled.Translate"
+                                       OnClick="TranslateCurrentText"
+                                       Disabled="@(_translating || string.IsNullOrWhiteSpace(_form.Description))"
+                                       Class="ml-4 px-6 animate__animated animate__fadeIn"
+                                       Elevation="4"
+                                       Style="border-radius:30px; text-transform:none; background: linear-gradient(90deg, #0ea5e9 0%, #38bdf8 100%);">
+                                @if (_translating)
+                                {
+                                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                                    <span>Đang dịch...</span>
+                                }
+                                else
+                                {
+                                    <span>Dịch ngay</span>
+                                }
+                            </MudButton>
+                        }
+                    </MudStack>
+
+                    @* ── Action Buttons ── *@
+                    <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center" Class="mb-3">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.VolumeUp"
+                                   OnClick="GenerateTTS" 
+                                   Disabled="@(_generatingTts || _generatingTtsAll || string.IsNullOrWhiteSpace(_form.Description))"
+                                   Style="border-radius:10px; text-transform:none">
                             @if (_generatingTts) { <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" /> }
-                            @Lang.T("Generate") (@_selectedTtsLang.ToUpper())
+                            Tạo thuyết minh (@GetLangDisplayName(_selectedTtsLang))
                         </MudButton>
-                        <MudButton Variant="Variant.Outlined" Color="Color.Default" Size="Size.Small"
+
+                        <MudButton Variant="Variant.Outlined" Color="Color.Success"
+                                   StartIcon="@Icons.Material.Filled.Translate"
+                                   OnClick="GenerateTTSAll" 
+                                   Disabled="@(_generatingTts || _generatingTtsAll || string.IsNullOrWhiteSpace(_form.Description))"
+                                   Style="border-radius:10px; text-transform:none">
+                            @if (_generatingTtsAll) { <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" /> }
+                            🌐 Tạo cả 3 ngôn ngữ
+                        </MudButton>
+
+                        <MudButton Variant="Variant.Text" Color="Color.Default" Size="Size.Small"
                                    StartIcon="@Icons.Material.Filled.Refresh"
-                                   OnClick="ResetTtsText">Đặt lại nội dung</MudButton>
+                                   OnClick="ResetTtsText">Đặt lại</MudButton>
                     </MudStack>
 
                     @if (!string.IsNullOrEmpty(_form.AudioUrl))
                     {
-                        <MudPaper Class="pa-3 mt-3" Elevation="0" Style="background:#e8f5e9;border-radius:8px">
+                        <MudPaper Class="pa-3 mt-1" Elevation="0" Style="background:rgba(76,175,80,0.08);border-radius:10px;border:1px solid rgba(76,175,80,0.2)">
                             <MudText Typo="Typo.caption" Color="Color.Success" Class="d-flex align-center mb-1">
                                 <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" Class="mr-1" />
                                 Audio thuyết minh đã sẵn sàng:
@@ -315,9 +372,10 @@
     </MudGrid>
 </DialogContent>
     <DialogActions>
-        <MudButton OnClick="CloseDialog" Variant="Variant.Outlined">@Lang.T("Cancel")</MudButton>
+        <MudButton OnClick="CloseDialog" Variant="Variant.Outlined" Style="border-radius:12px">@Lang.T("Cancel")</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled"
-                   OnClick="SaveStore" Disabled="_saving">
+                   OnClick="SaveStore" Disabled="_saving"
+                   Style="border-radius:12px; box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3)">
             @if (_saving) { <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" /> }
             @Lang.T("Save")
         </MudButton>
@@ -325,12 +383,13 @@
 </MudDialog>
 
 @code {
-    private bool _loading = true, _showDialog, _saving;
+    private bool _loading = true, _showDialog, _saving, _translating;
     private string _search = "", _filterStatus = "All", _filterCat = "All", _sortBy = "Mới nhất";
     private List<StoreModel> _stores = new();
     private StoreModel? _editing;
     private StoreModel _form = new();
     private int CurrentSellerId;
+    private string _viDescription = "";
 
     private string _selectedTtsLang = "vi";
     private List<(string Code, string Name)> _supportedLangs = new()
@@ -441,6 +500,8 @@
     private void OpenNew() 
     { 
         _editing = null; 
+        _selectedTtsLang = "vi";
+        _viDescription = "";
         _form = new() { SellerId = CurrentSellerId, Latitude = 10.762622, Longitude = 106.660172 }; 
         _showDialog = true; 
         _ = InitMapAsync();
@@ -449,12 +510,15 @@
     private void OpenEdit(StoreModel s) 
     { 
         _editing = s; 
+        _selectedTtsLang = "vi";
+        _viDescription = s.Description ?? "";
         _form = new StoreModel { 
             Id=s.Id, Name=s.Name, Phone=s.Phone, Address=s.Address, 
             Category=s.Category, Description=s.Description, 
             Latitude=s.Latitude, Longitude=s.Longitude, 
             SellerId=s.SellerId, AudioUrl=s.AudioUrl, 
-            ImageUrl=s.ImageUrl, MenuImagesUrl=s.MenuImagesUrl 
+            ImageUrl=s.ImageUrl, MenuImagesUrl=s.MenuImagesUrl,
+            AudioUrls = s.AudioUrls != null ? new Dictionary<string, string>(s.AudioUrls) : new Dictionary<string, string>()
         }; 
         _showDialog = true; 
         _ = InitMapAsync();
@@ -462,37 +526,55 @@
 
     private async Task SaveStore()
     {
+        // Cập nhật _viDescription nếu người dùng lưu khi đang ở tab tiếng Việt
+        if (_selectedTtsLang == "vi")
+        {
+            _viDescription = _form.Description ?? "";
+        }
+
         if (string.IsNullOrWhiteSpace(_form.Name)) return;
         _saving = true;
-        if (_editing == null)
+
+        // BẢO VỆ DỮ LIỆU: Luôn gửi bản gốc Tiếng Việt lên DB để làm mô tả chính của Shop
+        var currentDisplayDesc = _form.Description;
+        _form.Description = _viDescription;
+
+        try
         {
-            var (ok, msg) = await StoreSvc.CreateStoreAsync(_form);
-            Snackbar.Add(msg, ok ? Severity.Success : Severity.Error);
-            if (ok) 
+            if (_editing == null)
             {
-                _stores = await StoreSvc.GetStoresAsync(CurrentSellerId);
-                // Auto-switch to edit mode for the newly created shop so user can generate TTS
-                var newShop = _stores.OrderByDescending(s => s.Id).FirstOrDefault();
-                if (newShop != null)
+                var (ok, msg) = await StoreSvc.CreateStoreAsync(_form);
+                Snackbar.Add(msg, ok ? Severity.Success : Severity.Error);
+                if (ok) 
                 {
-                    _editing = newShop;
-                    _form.Id = newShop.Id;
-                    _form.AudioUrl = newShop.AudioUrl;
-                    Snackbar.Add("Bạn có thể tạo giọng thuyết minh ngay bây giờ!", Severity.Info);
+                    _stores = await StoreSvc.GetStoresAsync(CurrentSellerId);
+                    // Auto-switch to edit mode for the newly created shop so user can generate TTS
+                    var newShop = _stores.OrderByDescending(s => s.Id).FirstOrDefault();
+                    if (newShop != null)
+                    {
+                        _editing = newShop;
+                        _form.Id = newShop.Id;
+                        _form.AudioUrl = newShop.AudioUrl;
+                        Snackbar.Add("Bạn có thể tạo giọng thuyết minh ngay bây giờ!", Severity.Info);
+                    }
                 }
             }
+            else
+            {
+                var (ok, msg) = await StoreSvc.UpdateStoreAsync(_form);
+                Snackbar.Add(msg, ok ? Severity.Success : Severity.Error);
+                if (ok) _stores = await StoreSvc.GetStoresAsync(CurrentSellerId);
+            }
         }
-        else
+        finally
         {
-            var (ok, msg) = await StoreSvc.UpdateStoreAsync(_form);
-            Snackbar.Add(msg, ok ? Severity.Success : Severity.Error);
-            if (ok) _stores = await StoreSvc.GetStoresAsync(CurrentSellerId);
+            // Trả lại text hiển thị trên UI theo tab đang mở
+            _form.Description = currentDisplayDesc;
+            _saving = false;
         }
-        _saving = false;
     }
 
-    // private string _ttsText = ""; // Biến này không còn cần thiết vì dùng trực tiếp _form.Description
-    private bool _generatingTts, _isUploadingProfile, _isUploadingMenu;
+    private bool _generatingTts, _generatingTtsAll, _isUploadingProfile, _isUploadingMenu;
 
     private async Task HandleProfileUpload(InputFileChangeEventArgs e)
     {
@@ -528,7 +610,7 @@
                 return await StoreSvc.UploadMediaAsync(s, f.Name);
             });
             var results = await Task.WhenAll(uploadTasks);
-            var successfulUrls = results.Where(r => !string.IsNullOrEmpty(r)).ToList();
+            var successfulUrls = results.Where(r => !string.IsNullOrEmpty(r)).Select(r => r!).ToList();
             
             if (successfulUrls.Any())
             {
@@ -556,9 +638,93 @@
 
     private void ResetTtsText()
     {
-        // Reset nội dung về Tên quán và địa chỉ mặc định
         _form.Description = $"{_form.Name}. {_form.Phone}";
+        if (_selectedTtsLang == "vi")
+        {
+            _viDescription = _form.Description;
+        }
     }
+
+    private async Task SelectLang(string code)
+    {
+        if (_selectedTtsLang == code) return;
+        
+        // Lưu lại nội dung Tiếng Việt trước khi chuyển đi (nếu đang ở tab vi)
+        if (_selectedTtsLang == "vi")
+        {
+            _viDescription = _form.Description ?? "";
+        }
+        
+        _selectedTtsLang = code;
+        
+        // Cập nhật audio player trong dialog theo ngôn ngữ đang chọn
+        if (_editing != null && _editing.AudioUrls != null && _editing.AudioUrls.TryGetValue(code, out var existingAudio))
+        {
+            _form.AudioUrl = existingAudio;
+        }
+        else if (code == "vi" && _editing != null && !string.IsNullOrEmpty(_editing.AudioUrl) && _editing.AudioUrls?.ContainsKey("vi") != true)
+        {
+            // Fallback cho bản cũ nếu chưa có trong AudioUrls
+            _form.AudioUrl = _editing.AudioUrl;
+        }
+        else
+        {
+            _form.AudioUrl = "";
+        }
+        
+        // Khôi phục văn bản
+        if (code == "vi")
+        {
+            _form.Description = _viDescription;
+            StateHasChanged(); // Ép UI vẽ lại nội dung Tiếng Việt gốc
+        }
+        else
+        {
+            // Tự động dịch từ Tiếng Việt (gốc) sang ngôn ngữ mới
+            await TranslateCurrentText();
+        }
+    }
+
+    private async Task TranslateCurrentText()
+    {
+        var textToTranslate = _selectedTtsLang == "vi" ? _form.Description : _viDescription;
+        if (string.IsNullOrWhiteSpace(textToTranslate) || _selectedTtsLang == "vi") return;
+        
+        _translating = true;
+        try
+        {
+            var translated = await StoreSvc.TranslateTextAsync(textToTranslate, _selectedTtsLang);
+            if (!string.IsNullOrEmpty(translated))
+            {
+                _form.Description = translated;
+                Snackbar.Add($"Đã dịch sang {GetLangDisplayName(_selectedTtsLang)}!", Severity.Info);
+                
+                // Tự động tạo audio thuyết minh sau khi dịch (nếu cửa hàng đã được lưu)
+                if (_editing != null)
+                {
+                    await GenerateTTS();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Lỗi dịch thuật: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _translating = false;
+            // Ép UI cập nhật để MudTextField nhận chuỗi mới ngay lập tức
+            StateHasChanged(); 
+        }
+    }
+
+    private string GetLangDisplayName(string code) => code switch
+    {
+        "vi" => "Tiếng Việt",
+        "en" => "English",
+        "zh" => "中文",
+        _ => code.ToUpper()
+    };
 
     private async Task GenerateTTS()
     {
@@ -570,9 +736,11 @@
         
         if (result.ValueKind != JsonValueKind.Undefined && result.TryGetProperty("audioUrl", out var audioUrlProp))
         {
-            var audioUrl = audioUrlProp.GetString();
+            var audioUrl = audioUrlProp.GetString() ?? "";
             _form.AudioUrl = audioUrl;
             _editing.AudioUrl = audioUrl;
+            if (_editing.AudioUrls == null) _editing.AudioUrls = new Dictionary<string, string>();
+            _editing.AudioUrls[_selectedTtsLang] = audioUrl;
 
             // Cập nhật text đã dịch vào Form để Seller thấy
             if (result.TryGetProperty("description", out var descProp))
@@ -594,6 +762,70 @@
             Snackbar.Add("Lỗi khi tạo TTS hoặc dịch thuật. Vui lòng kiểm tra lại cấu hình Azure.", Severity.Error);
         }
         _generatingTts = false;
+    }
+
+    private async Task GenerateTTSAll()
+    {
+        if (_editing == null || string.IsNullOrWhiteSpace(_form.Description)) return;
+        _generatingTtsAll = true;
+        StateHasChanged();
+        
+        try
+        {
+            var result = await StoreSvc.GenerateTTSAllLanguagesAsync(_editing.Id, _form.Description);
+            
+            if (result.ValueKind != JsonValueKind.Undefined && result.TryGetProperty("results", out var resultsProp))
+            {
+                int successCount = 0;
+                int failCount = 0;
+                var details = new List<string>();
+                
+                foreach (var item in resultsProp.EnumerateArray())
+                {
+                    var success = item.TryGetProperty("success", out var successPropItem) && successPropItem.GetBoolean();
+                    var langName = item.TryGetProperty("languageName", out var langNameProp) ? langNameProp.GetString() : "";
+                    
+                    if (success)
+                    {
+                        successCount++;
+                        details.Add($"✅ {langName}");
+                    }
+                    else
+                    {
+                        failCount++;
+                        details.Add($"❌ {langName}");
+                    }
+                }
+
+                // Update current form with Vietnamese audio URL
+                var viResult = resultsProp.EnumerateArray()
+                    .FirstOrDefault(x => x.TryGetProperty("language", out var lp) && lp.GetString() == "vi");
+                if (viResult.ValueKind != JsonValueKind.Undefined && viResult.TryGetProperty("audioUrl", out var viAudioProp))
+                {
+                    _form.AudioUrl = viAudioProp.GetString();
+                    _editing.AudioUrl = _form.AudioUrl;
+                }
+
+                _stores = await StoreSvc.GetStoresAsync(CurrentSellerId);
+                
+                // Show a SINGLE summary snackbar instead of one per language
+                var summaryMsg = failCount == 0
+                    ? $"🎉 Đã tạo thuyết minh cho cả {successCount} ngôn ngữ thành công! ({string.Join(", ", details)})"
+                    : $"Kết quả: {successCount} thành công, {failCount} thất bại ({string.Join(", ", details)})";
+                
+                Snackbar.Add(summaryMsg, failCount == 0 ? Severity.Success : Severity.Warning);
+            }
+            else
+            {
+                Snackbar.Add("Lỗi khi tạo TTS đa ngôn ngữ. Vui lòng kiểm tra lại cấu hình Azure.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Lỗi: {ex.Message}", Severity.Error);
+        }
+        
+        _generatingTtsAll = false;
     }
 
     private void CloseDialog() { _showDialog = false; }

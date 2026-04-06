@@ -1,10 +1,15 @@
 using AppUser.ViewModels;
+using CommunityToolkit.Maui.Core.Primitives;
+using CommunityToolkit.Maui.Views;
 
 namespace AppUser.Pages
 {
     public partial class AudioPlayerPage : ContentPage
     {
         private readonly AudioPlayerViewModel _vm;
+        private static readonly HttpClient _httpClient = new();
+        private bool _isLoadingSource;
+        private string _currentUrl = string.Empty;
 
         public AudioPlayerPage(AudioPlayerViewModel vm)
         {
@@ -16,9 +21,15 @@ namespace AppUser.Pages
         protected override void OnAppearing()
         {
             base.OnAppearing();
+
+            // Subscribe to events FIRST
             _vm.PlayRequested += OnPlayRequested;
             _vm.PauseRequested += OnPauseRequested;
             _vm.SeekRequested += OnSeekRequested;
+            _vm.SourceChanged += OnSourceChanged;
+
+            // Then load and play audio if available
+            _ = LoadAndPlayAudioAsync();
         }
 
         protected override void OnDisappearing()
@@ -27,30 +38,133 @@ namespace AppUser.Pages
             _vm.PlayRequested -= OnPlayRequested;
             _vm.PauseRequested -= OnPauseRequested;
             _vm.SeekRequested -= OnSeekRequested;
-            MediaElement.Stop();
+            _vm.SourceChanged -= OnSourceChanged;
+            
+            try { MediaElement.Stop(); } catch { /* ignore */ }
         }
 
-        private void OnPlayRequested(object? sender, EventArgs e) => MediaElement.Play();
-        private void OnPauseRequested(object? sender, EventArgs e) => MediaElement.Pause();
-        private void OnSeekRequested(object? sender, double position) => 
-            MediaElement.SeekTo(TimeSpan.FromSeconds(position * MediaElement.Duration.TotalSeconds));
+        /// <summary>Load audio from URL to local cache and play in-app.</summary>
+        private async Task LoadAndPlayAudioAsync()
+        {
+            if (_isLoadingSource) return;
+            var url = _vm.AudioUrl;
+            if (string.IsNullOrWhiteSpace(url)) 
+            {
+                System.Diagnostics.Debug.WriteLine("[AudioPlayer] AudioUrl is empty, cannot play.");
+                return;
+            }
 
-        private void OnMediaElementPositionChanged(object? sender, CommunityToolkit.Maui.Core.Primitives.MediaPositionChangedEventArgs e)
+            System.Diagnostics.Debug.WriteLine($"[AudioPlayer] Loading audio from: {url}");
+            _currentUrl = url;
+
+            try
+            {
+                _isLoadingSource = true;
+                FallbackAudioContainer.IsVisible = false;
+
+                // Download to cache then play local file for better reliability across platforms.
+                var bytes = await _httpClient.GetByteArrayAsync(url);
+                var ext = Path.GetExtension(new Uri(url).AbsolutePath);
+                if (string.IsNullOrWhiteSpace(ext)) ext = ".mp3";
+                var fileName = $"poi_audio_{Guid.NewGuid():N}{ext}";
+                var localPath = Path.Combine(FileSystem.CacheDirectory, fileName);
+                await File.WriteAllBytesAsync(localPath, bytes);
+
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    try
+                    {
+                        MediaElement.Source = CommunityToolkit.Maui.Views.MediaSource.FromFile(localPath);
+                        MediaElement.Play();
+                        System.Diagnostics.Debug.WriteLine($"[AudioPlayer] Playing local file: {localPath}");
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[AudioPlayer] Play() failed: {ex.Message}");
+                        ShowFallbackWebPlayer(url);
+                    }
+                });
+
+                _ = EnsureStartedOrFallbackAsync(url);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[AudioPlayer] Error loading source: {ex.Message}");
+                ShowFallbackWebPlayer(url);
+            }
+            finally
+            {
+                _isLoadingSource = false;
+            }
+        }
+
+        private void OnSourceChanged(object? sender, EventArgs e)
+        {
+            // When source changes (e.g. language switch), reload
+            _ = LoadAndPlayAudioAsync();
+        }
+
+        private void OnPlayRequested(object? sender, EventArgs e)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                try { MediaElement.Play(); }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[AudioPlayer] Play error: {ex.Message}");
+                }
+            });
+        }
+
+        private void OnPauseRequested(object? sender, EventArgs e)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                try { MediaElement.Pause(); }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[AudioPlayer] Pause error: {ex.Message}");
+                }
+            });
+        }
+
+        private void OnSeekRequested(object? sender, double position)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                try
+                {
+                    MediaElement.SeekTo(TimeSpan.FromSeconds(position * MediaElement.Duration.TotalSeconds));
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[AudioPlayer] Seek error: {ex.Message}");
+                }
+            });
+        }
+
+        private void OnMediaElementPositionChanged(object? sender, MediaPositionChangedEventArgs e)
         {
             _vm.UpdateProgress(e.Position, MediaElement.Duration);
         }
 
         private bool _isAnimating = false;
 
-        private void OnMediaElementStateChanged(object? sender, CommunityToolkit.Maui.Core.Primitives.MediaStateChangedEventArgs e)
+        private void OnMediaElementStateChanged(object? sender, MediaStateChangedEventArgs e)
         {
-            var isPlayingNow = e.NewState == CommunityToolkit.Maui.Core.Primitives.MediaElementState.Playing;
+            System.Diagnostics.Debug.WriteLine($"[AudioPlayer] State changed to: {e.NewState}");
             
-            // Cập nhật ViewModel trên UI Thread để an toàn
+            var isPlayingNow = e.NewState == MediaElementState.Playing;
+            
             MainThread.BeginInvokeOnMainThread(() => {
                 _vm.IsPlaying = isPlayingNow;
                 
-                // Điều khiển hiệu ứng xoay đĩa dựa trên trạng thái mới
+                // Track Listen automatically when state becomes Playing
+                if (isPlayingNow)
+                {
+                    _vm.CheckAndTrackListen();
+                }
+
                 if (isPlayingNow)
                     StartRotationAnimation();
                 else
@@ -60,21 +174,17 @@ namespace AppUser.Pages
 
         private async void StartRotationAnimation()
         {
-            // Nếu đang trong vòng lặp xoay rồi thì không tạo thêm vòng lặp mới (Tránh Crash)
             if (_isAnimating) return;
             
             _isAnimating = true;
             try
             {
-                // Xoay liên tục trong khi nhạc đang phát
                 while (_vm.IsPlaying)
                 {
-                    // Xoay 360 độ trong 12 giây cho cảm giác thư thái
                     await AlbumArtBorder.RotateTo(360, 12000, Easing.Linear);
                     
                     if (!_vm.IsPlaying) break;
                     
-                    // Reset góc quay về 0 ngay lập tức để vòng tiếp theo mượt mà
                     AlbumArtBorder.Rotation = 0;
                 }
             }
@@ -90,8 +200,42 @@ namespace AppUser.Pages
 
         private void StopRotationAnimation()
         {
-            // Dừng hoạt ảnh đang chạy ngay lập tức
             AlbumArtBorder.CancelAnimations();
+        }
+
+        private async void OnMediaElementMediaFailed(object? sender, CommunityToolkit.Maui.Core.Primitives.MediaFailedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine($"[AudioPlayer] Media FAILED. URL was: {_vm.AudioUrl}");
+            ShowFallbackWebPlayer(_vm.AudioUrl);
+        }
+
+        private async Task EnsureStartedOrFallbackAsync(string url)
+        {
+            await Task.Delay(3500);
+            if (!_vm.IsPlaying && url == _currentUrl)
+            {
+                ShowFallbackWebPlayer(url);
+            }
+        }
+
+        private void ShowFallbackWebPlayer(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url)) return;
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                var safeUrl = Uri.EscapeUriString(url);
+                var html = $"""
+                    <html>
+                      <body style="margin:0;background:#101828;color:white;font-family:Segoe UI;">
+                        <audio controls autoplay style="width:100%;">
+                          <source src="{safeUrl}" type="audio/mpeg" />
+                        </audio>
+                      </body>
+                    </html>
+                    """;
+                FallbackAudioWebView.Source = new HtmlWebViewSource { Html = html };
+                FallbackAudioContainer.IsVisible = true;
+            });
         }
     }
 }

@@ -93,4 +93,66 @@ public class PoiService : IPoiService
 			Description = first.Description
 		};
 	}
+
+	public async Task<POIAdminDto?> UpdateAsync(int id, CreatePoiDto dto)
+	{
+		var poi = await _context.POIs
+			.Include(p => p.Translations)
+			.FirstOrDefaultAsync(p => p.Id == id);
+
+		if (poi == null) return null;
+
+		poi.ImageUrl = dto.ImageUrl;
+		poi.Location = dto.Location;
+		poi.Latitude = dto.Latitude;
+		poi.Longitude = dto.Longitude;
+
+		// Sync translations
+		foreach (var tDto in dto.Translations)
+		{
+			var existing = poi.Translations.FirstOrDefault(x => x.LanguageCode == tDto.LanguageCode);
+			if (existing != null)
+			{
+				existing.Name = tDto.Name;
+				existing.Description = tDto.Description;
+			}
+			else
+			{
+				poi.Translations.Add(new POITranslation
+				{
+					LanguageCode = tDto.LanguageCode,
+					Name = tDto.Name,
+					Description = tDto.Description
+				});
+			}
+		}
+
+		await _context.SaveChangesAsync();
+
+		var first = poi.Translations.FirstOrDefault(x => x.LanguageCode == "vi") ?? poi.Translations.First();
+
+		return new POIAdminDto
+		{
+			Id = poi.Id,
+			ImageUrl = poi.ImageUrl,
+			Location = poi.Location,
+			Name = first.Name,
+			Description = first.Description,
+			AudioUrl = first.AudioUrl
+		};
+	}
+
+	public async Task<bool> LinkShopsAsync(int poiId, List<int> shopIds)
+	{
+		// Reset old links
+		var oldShops = await _context.Shops.Where(s => s.PoiId == poiId).ToListAsync();
+		foreach (var s in oldShops) s.PoiId = null;
+
+		// Set new links
+		var newShops = await _context.Shops.Where(s => shopIds.Contains(s.Id)).ToListAsync();
+		foreach (var s in newShops) s.PoiId = poiId;
+
+		await _context.SaveChangesAsync();
+		return true;
+	}
 }

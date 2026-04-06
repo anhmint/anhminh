@@ -112,6 +112,24 @@ public class StoreService
         return await _api.PostAsync<object, JsonElement>($"owner/shops/{storeId}/generate-tts", new { text, langCode });
     }
 
+    /// <summary>
+    /// Generate TTS audio for ALL 3 languages (vi, en, zh) in one shot.
+    /// </summary>
+    public async Task<JsonElement> GenerateTTSAllLanguagesAsync(int storeId, string? text = null)
+    {
+        return await _api.PostAsync<object, JsonElement>($"owner/shops/{storeId}/generate-tts-all", new { text });
+    }
+
+    public async Task<string?> TranslateTextAsync(string text, string targetLang)
+    {
+        var response = await _api.PostAsync<object, JsonElement>("owner/shops/translate", new { text, targetLang });
+        if (response.ValueKind != JsonValueKind.Undefined && response.TryGetProperty("translatedText", out var translatedProp))
+        {
+            return translatedProp.GetString();
+        }
+        return null;
+    }
+
     public async Task<bool> DeleteStoreAsync(int id)
     {
         return await _api.DeleteAsync($"owner/shops/{id}");
@@ -129,6 +147,11 @@ public class StoreService
 
     // ── Sellers ─────────────────────────────────────────────────────
 
+    public async Task<List<CustomerModel>> GetAllUsersAsync()
+    {
+        return await _api.GetAsync<List<CustomerModel>>("admin/users") ?? new();
+    }
+
     public async Task<List<SellerModel>> GetSellersAsync()
     {
         var sellers = await _api.GetAsync<List<SellerModel>>("admin/users/sellers") ?? new();
@@ -145,11 +168,22 @@ public class StoreService
         return await _api.PatchAsync($"admin/users/{id}/status?status={status}");
     }
 
+    public async Task<bool> DeleteUserAsync(int id)
+    {
+        return await _api.DeleteAsync($"admin/users/{id}");
+    }
+
     // ── Customers ───────────────────────────────────────────────────
 
     public async Task<List<CustomerModel>> GetCustomersAsync()
     {
         return await _api.GetAsync<List<CustomerModel>>("admin/users/customers") ?? new();
+    }
+
+    public async Task<bool> SeedCustomersAsync()
+    {
+        var res = await _api.PostAsync<object, string>("admin/users/seed-customers", new { });
+        return res != null;
     }
 
     public async Task<bool> UpdateCustomerStatusAsync(int id, string status)
@@ -161,13 +195,47 @@ public class StoreService
 
     // ── Stats ────────────────────────────────────────────────────────
 
-    public async Task<List<StatModel>> GetSellerStatsAsync(int sellerId)
+    public async Task<List<StatModel>> GetSellerStatsAsync(int sellerId, int? storeId = null)
     {
-        return await _api.GetAsync<List<StatModel>>($"/stats/seller/{sellerId}") ?? new List<StatModel>();
+        var query = $"stats/seller/{sellerId}";
+        if (storeId.HasValue && storeId.Value > 0)
+        {
+            query += $"?storeId={storeId.Value}";
+        }
+        return await _api.GetAsync<List<StatModel>>(query) ?? new List<StatModel>();
     }
 
-    public async Task<List<ReviewModel>> GetStoreReviewsAsync(int storeId)
+    public async Task<List<ReviewModel>> GetStoreReviewsAsync(int storeId, int sellerId = 0)
     {
-        return await _api.GetAsync<List<ReviewModel>>($"/stores/{storeId}/reviews") ?? new List<ReviewModel>();
+        var url = $"stores/{storeId}/reviews";
+        if (storeId == 0 && sellerId > 0) url += $"?sellerId={sellerId}";
+        return await _api.GetAsync<List<ReviewModel>>(url) ?? new List<ReviewModel>();
+    }
+
+    // ── Revenue ─────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Get admin revenue stats filtered by year and optionally by month.
+    /// </summary>
+    public async Task<AdminRevenueModel?> GetAdminRevenueAsync(int? month, int year)
+    {
+        var query = $"admin/stats/revenue?year={year}";
+        if (month.HasValue)
+            query += $"&month={month.Value}";
+        return await _api.GetAsync<AdminRevenueModel>(query);
+    }
+
+    /// <summary>
+    /// Get seller revenue stats for a specific week.
+    /// </summary>
+    public async Task<SellerRevenueModel?> GetSellerRevenueAsync(int sellerId, string? weekDate = null, int? storeId = null)
+    {
+        var query = $"stats/seller/{sellerId}/revenue";
+        var param = new List<string>();
+        if (!string.IsNullOrEmpty(weekDate)) param.Add($"week={weekDate}");
+        if (storeId.HasValue && storeId.Value > 0) param.Add($"storeId={storeId.Value}");
+        if (param.Any()) query += "?" + string.Join("&", param);
+        
+        return await _api.GetAsync<SellerRevenueModel>(query);
     }
 }

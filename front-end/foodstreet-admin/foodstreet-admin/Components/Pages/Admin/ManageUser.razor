@@ -1,0 +1,176 @@
+@page "/admin/manage-user"
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject foodstreet_admin.Services.StoreService StoreSvc
+@inject ISnackbar Snackbar
+
+<PageTitle>Quản lý Người dùng</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-6 animate-fade-in-up">
+    <div class="gradient-icon mr-3" style="background: var(--primary-gradient)">
+        <MudIcon Icon="@Icons.Material.Filled.ManageAccounts" Size="Size.Large" />
+    </div>
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h5" Style="font-weight:800; letter-spacing: -0.5px">👥 Tất cả Người dùng</MudText>
+        <MudText Typo="Typo.body2" Style="color: #64748b; font-weight: 500">Quản lý tổng thể Admin, Người bán và Khách tham quan</MudText>
+    </MudStack>
+</MudStack>
+
+<!-- Filters -->
+<MudPaper Class="glass-card pa-4 mb-6 border-0 animate-fade-in-up delay-1" Elevation="0">
+    <MudGrid AlignItems="AlignItems.Center">
+        <MudItem xs="12" md="4">
+            <MudTextField @bind-Value="_search" Label="Tìm theo tên, email..."
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
+                          Variant="Variant.Outlined" Dense="true" Immediate="true"
+                          Style="background: rgba(255,255,255,0.5); border-radius: 10px" />
+        </MudItem>
+        <MudItem xs="12" md="3">
+            <MudSelect @bind-Value="_filterRole" Label="Vai trò" Variant="Variant.Outlined" Dense="true"
+                        Style="background: rgba(255,255,255,0.5); border-radius: 10px">
+                <MudSelectItem Value="@("All")">Tất cả vai trò</MudSelectItem>
+                <MudSelectItem Value="@("ADMIN")">Admin</MudSelectItem>
+                <MudSelectItem Value="@("OWNER")">Sellers (Owner)</MudSelectItem>
+                <MudSelectItem Value="@("USER")">Khách hàng (User)</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="3">
+            <MudSelect @bind-Value="_filterStatus" Label="Trạng thái" Variant="Variant.Outlined" Dense="true"
+                        Style="background: rgba(255,255,255,0.5); border-radius: 10px">
+                <MudSelectItem Value="@("All")">Tất cả trạng thái</MudSelectItem>
+                <MudSelectItem Value="@("Active")">Đang hoạt động</MudSelectItem>
+                <MudSelectItem Value="@("Disabled")">Vô hiệu hóa</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="2" Class="d-flex align-center justify-end">
+             <div class="px-4 py-2" style="background: rgba(99, 102, 241, 0.1); border-radius: 20px; color: #4f46e5">
+                <MudText Typo="Typo.body2" Style="font-weight:700">
+                    @Filtered.Count() Users
+                </MudText>
+             </div>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@if (_loading)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mb-2" />
+}
+
+<MudPaper Elevation="0" Class="glass-card overflow-hidden border-0 animate-fade-in-up delay-2">
+    <MudTable Items="@Filtered" Hover="true" Dense="true" Elevation="0" Class="transparent-table"
+              Loading="@_loading">
+        <HeaderContent>
+            <MudTh Style="font-weight:700">Người dùng</MudTh>
+            <MudTh Style="font-weight:700">Email</MudTh>
+            <MudTh Style="font-weight:700">Vai trò</MudTh>
+            <MudTh Style="font-weight:700">Trạng thái</MudTh>
+            <MudTh Style="font-weight:700">Ngày đăng ký</MudTh>
+            <MudTh Style="font-weight:700">Thao tác</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                    <MudAvatar Style="background: var(--primary-gradient); color: white; border-radius: 12px">
+                        @(string.IsNullOrEmpty(context.FullName) ? "?" : context.FullName[0].ToString().ToUpper())
+                    </MudAvatar>
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.body2" Style="font-weight:700; color: #1e293b">@(string.IsNullOrEmpty(context.FullName) ? "N/A" : context.FullName)</MudText>
+                        <MudText Typo="Typo.caption" Style="color: #64748b">ID: #@context.Id</MudText>
+                    </MudStack>
+                </MudStack>
+            </MudTd>
+            <MudTd>
+                <MudText Typo="Typo.body2" Style="font-weight:500; color: #1e293b">@context.Email</MudText>
+            </MudTd>
+            <MudTd>
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="@RoleColor(context.Role)" Style="font-weight:700">
+                    @context.Role
+                </MudChip>
+            </MudTd>
+            <MudTd>
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Filled"
+                         Color="@(context.Status == "Active" ? Color.Success : Color.Error)" Style="font-weight:700; border-radius: 8px">
+                    @context.Status.ToUpper()
+                </MudChip>
+            </MudTd>
+            <MudTd>
+                <MudText Typo="Typo.body2" Style="color: #64748b; font-weight:500">@context.RegisteredAt.ToString("dd/MM/yyyy")</MudText>
+            </MudTd>
+            <MudTd>
+                <MudStack Row="true" Spacing="0">
+                    @if (context.Status == "Active")
+                    {
+                        <MudIconButton Icon="@Icons.Material.Rounded.Block" Size="Size.Small"
+                                       Color="Color.Warning" Title="Vô hiệu hóa"
+                                       OnClick="@(async () => await SetStatus(context, "Disabled"))" />
+                    }
+                    else
+                    {
+                        <MudIconButton Icon="@Icons.Material.Rounded.LockOpen" Size="Size.Small"
+                                       Color="Color.Success" Title="Kích hoạt lại"
+                                       OnClick="@(async () => await SetStatus(context, "Active"))" />
+                    }
+                    <MudIconButton Icon="@Icons.Material.Rounded.Delete" Size="Size.Small"
+                                   Color="Color.Error" Title="Xoá tài khoản"
+                                   OnClick="@(async () => await DeleteUser(context))" />
+                </MudStack>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10, 25, 50}" />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private bool _loading = true;
+    private string _search = "", _filterStatus = "All", _filterRole = "All";
+    private List<foodstreet_admin.Models.CustomerModel> _users = new();
+
+    private IEnumerable<foodstreet_admin.Models.CustomerModel> Filtered => _users.Where(u =>
+        (string.IsNullOrEmpty(_search) ||
+         (u.FullName != null && u.FullName.Contains(_search, StringComparison.OrdinalIgnoreCase)) ||
+         u.Email.Contains(_search, StringComparison.OrdinalIgnoreCase)) &&
+        (_filterStatus == "All" || u.Status == _filterStatus) &&
+        (_filterRole == "All" || u.Role == _filterRole));
+
+    private Color RoleColor(string role) => role switch
+    {
+        "ADMIN" => Color.Warning,
+        "OWNER" => Color.Primary,
+        "USER" => Color.Info,
+        _ => Color.Default
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _users = await StoreSvc.GetAllUsersAsync();
+        _loading = false;
+    }
+
+    private async Task SetStatus(foodstreet_admin.Models.CustomerModel u, string status)
+    {
+        var ok = await StoreSvc.UpdateCustomerStatusAsync(u.Id, status);
+        if (ok)
+        {
+            u.Status = status;
+            Snackbar.Add($"Đã cập nhật trạng thái: {status}", Severity.Success);
+        }
+        else Snackbar.Add("Lỗi cập nhật!", Severity.Error);
+    }
+
+    private async Task DeleteUser(foodstreet_admin.Models.CustomerModel u)
+    {
+        var ok = await StoreSvc.DeleteUserAsync(u.Id);
+        if (ok)
+        {
+            _users.Remove(u);
+            Snackbar.Add($"Đã xoá tài khoản: {u.Email}", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Có lỗi khi xoá! Có thể tài khoản này đang sở hữu CH/POI hoặc thông tin liên quan.", Severity.Error);
+        }
+    }
+}

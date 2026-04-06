@@ -4,6 +4,7 @@
 @rendermode InteractiveServer
 @using MudBlazor
 @inject foodstreet_admin.Services.ApiService Api
+@inject foodstreet_admin.Services.StoreService StoreSvc
 
 <PageTitle>Thống kê & Báo cáo</PageTitle>
 
@@ -28,11 +29,27 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" md="3">
-            <MudSelect @bind-Value="filterPeriod" Label="Kỳ báo cáo" Variant="Variant.Outlined" Dense="true">
-                <MudSelectItem Value="@("month")">Tháng này</MudSelectItem>
-                <MudSelectItem Value="@("quarter")">Quý này</MudSelectItem>
-                <MudSelectItem Value="@("year")">Năm nay</MudSelectItem>
+            <MudSelect T="int" @bind-Value="filterYear" Label="Năm" Variant="Variant.Outlined" Dense="true">
+                @for (int y = DateTime.Now.Year; y >= 2024; y--)
+                {
+                    var yearVal = y;
+                    <MudSelectItem Value="@yearVal">@yearVal</MudSelectItem>
+                }
             </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="3">
+            <MudSelect T="int" @bind-Value="filterMonth" Label="Tháng" Variant="Variant.Outlined" Dense="true">
+                <MudSelectItem Value="0">Tất cả (cả năm)</MudSelectItem>
+                @for (int m = 1; m <= 12; m++)
+                {
+                    var monthVal = m;
+                    <MudSelectItem Value="@monthVal">Tháng @monthVal</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="3">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Search"
+                       OnClick="LoadRevenueData" FullWidth="true">Lọc doanh thu</MudButton>
         </MudItem>
     </MudGrid>
 </MudPaper>
@@ -63,13 +80,81 @@
     <MudItem xs="6" md="3">
         <MudPaper Class="pa-4 text-center" Elevation="2">
             <MudIcon Icon="@Icons.Material.Filled.AttachMoney" Color="Color.Warning" Size="Size.Large" />
-            <MudText Typo="Typo.h4" Color="Color.Warning"><b>@revenue.ToString("N0")</b></MudText>
+            <MudText Typo="Typo.h4" Color="Color.Warning"><b>@revenueTotal.ToString("N0")</b></MudText>
             <MudText Typo="Typo.body2">Doanh thu (VNĐ)</MudText>
         </MudPaper>
     </MudItem>
 </MudGrid>
 
+@if (isLoadingRevenue)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mb-4" />
+}
+
 <MudGrid>
+    <!-- Revenue by Month -->
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-4" Elevation="2">
+            <MudText Typo="Typo.h6" Class="mb-3">📈 Doanh thu theo tháng (@filterYear)</MudText>
+            <MudTable Items="@revenueByMonth" Hover="true" Dense="true" Striped="true">
+                <HeaderContent>
+                    <MudTh>Tháng</MudTh>
+                    <MudTh>Đơn hàng</MudTh>
+                    <MudTh>Doanh thu (VNĐ)</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>Tháng @context.Month</MudTd>
+                    <MudTd>@context.OrderCount</MudTd>
+                    <MudTd>
+                        <MudText Typo="Typo.body2" Style="font-weight:600; color: #10b981">
+                            @context.Revenue.ToString("N0") đ
+                        </MudText>
+                    </MudTd>
+                </RowTemplate>
+                <NoRecordsContent>
+                    <MudText>Chưa có dữ liệu doanh thu.</MudText>
+                </NoRecordsContent>
+            </MudTable>
+        </MudPaper>
+    </MudItem>
+
+    <!-- Revenue by Shop -->
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-4" Elevation="2">
+            <MudText Typo="Typo.h6" Class="mb-3">🏪 Doanh thu theo cửa hàng</MudText>
+            <MudTable Items="@revenueByShop" Hover="true" Dense="true" Striped="true">
+                <HeaderContent>
+                    <MudTh>#</MudTh>
+                    <MudTh>Cửa hàng</MudTh>
+                    <MudTh>Đơn hàng</MudTh>
+                    <MudTh>Doanh thu (VNĐ)</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>
+                        @{
+                            var rank = revenueByShop.IndexOf(context) + 1;
+                            var color = rank == 1 ? "#FFD700" : rank == 2 ? "#C0C0C0" : rank == 3 ? "#CD7F32" : "";
+                        }
+                        <MudText Style="@($"color:{color}; font-weight: bold")">@rank</MudText>
+                    </MudTd>
+                    <MudTd>@context.ShopName</MudTd>
+                    <MudTd>@context.OrderCount</MudTd>
+                    <MudTd>
+                        @if (revenueByShop.Any() && revenueByShop.Max(s => s.Revenue) > 0)
+                        {
+                            <MudProgressLinear Value="@((double)(context.Revenue / revenueByShop.Max(s => s.Revenue)) * 100)"
+                                               Color="Color.Success" Rounded="true" Class="my-1" />
+                        }
+                        <MudText Typo="Typo.caption" Style="font-weight:600">@context.Revenue.ToString("N0") đ</MudText>
+                    </MudTd>
+                </RowTemplate>
+                <NoRecordsContent>
+                    <MudText>Chưa có dữ liệu doanh thu.</MudText>
+                </NoRecordsContent>
+            </MudTable>
+        </MudPaper>
+    </MudItem>
+
     <!-- Top Stores by Listens -->
     <MudItem xs="12" md="6">
         <MudPaper Class="pa-4" Elevation="2">
@@ -84,16 +169,19 @@
                 <RowTemplate>
                     <MudTd>
                         @{
-                            var rank = topStores.IndexOf(context) + 1;
-                            var color = rank == 1 ? "#FFD700" : rank == 2 ? "#C0C0C0" : rank == 3 ? "#CD7F32" : "";
+                            var listenRank = topStores.IndexOf(context) + 1;
+                            var listenColor = listenRank == 1 ? "#FFD700" : listenRank == 2 ? "#C0C0C0" : listenRank == 3 ? "#CD7F32" : "";
                         }
-                        <MudText Style="@($"color:{color}; font-weight: bold")">@rank</MudText>
+                        <MudText Style="@($"color:{listenColor}; font-weight: bold")">@listenRank</MudText>
                     </MudTd>
                     <MudTd>@context.Name</MudTd>
                     <MudTd>@context.Category</MudTd>
                     <MudTd>
-                        <MudProgressLinear Value="@((double)context.Listens / topStores.Max(s => s.Listens) * 100)"
-                                           Color="Color.Info" Rounded="true" Class="my-1" />
+                        @if (topStores.Any() && topStores.Max(s => s.Listens) > 0)
+                        {
+                            <MudProgressLinear Value="@((double)context.Listens / topStores.Max(s => s.Listens) * 100)"
+                                               Color="Color.Info" Rounded="true" Class="my-1" />
+                        }
                         <MudText Typo="Typo.caption">@context.Listens.ToString("N0")</MudText>
                     </MudTd>
                 </RowTemplate>
@@ -123,64 +211,64 @@
             </MudTable>
         </MudPaper>
     </MudItem>
-
-    <!-- Monthly Overview -->
-    <MudItem xs="12">
-        <MudPaper Class="pa-4" Elevation="2">
-            <MudText Typo="Typo.h6" Class="mb-3">📈 Tổng quan theo tháng</MudText>
-            <MudTable Items="@monthlyOverview" Hover="true" Dense="true" Striped="true">
-                <HeaderContent>
-                    <MudTh>Tháng</MudTh>
-                    <MudTh>Gian hàng mới</MudTh>
-                    <MudTh>Khách mới</MudTh>
-                    <MudTh>Tổng lượt nghe</MudTh>
-                    <MudTh>Doanh thu (VNĐ)</MudTh>
-                    <MudTh>Tăng trưởng</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd>@context.Month</MudTd>
-                    <MudTd>@context.NewStores</MudTd>
-                    <MudTd>@context.NewCustomers</MudTd>
-                    <MudTd>@context.TotalListens.ToString("N0")</MudTd>
-                    <MudTd>@context.Revenue.ToString("N0") đ</MudTd>
-                    <MudTd>
-                        <MudChip T="string" Size="Size.Small"
-                                 Color="@(context.Growth >= 0 ? Color.Success : Color.Error)">
-                            @(context.Growth >= 0 ? "+" : "")@context.Growth%
-                        </MudChip>
-                    </MudTd>
-                </RowTemplate>
-            </MudTable>
-        </MudPaper>
-    </MudItem>
 </MudGrid>
 
 @code {
     private string filterLanguage = "all";
-    private string filterPeriod = "month";
+    private int filterYear = DateTime.Now.Year;
+    private int filterMonth = 0; // 0 = all months
 
     private int totalStores = 0;
     private int totalCustomers = 0;
     private int totalListens = 0;
-    private decimal revenue = 0;
+    private decimal revenueTotal = 0;
+    private bool isLoadingRevenue = false;
 
     private List<foodstreet_admin.Models.TopStoreModel> topStores = new();
     private List<foodstreet_admin.Models.LangStatModel> langStats = new();
-    private List<foodstreet_admin.Models.MonthlyOverviewModel> monthlyOverview = new();
+    private List<foodstreet_admin.Models.ShopRevenueItem> revenueByShop = new();
+    private List<foodstreet_admin.Models.MonthlyRevenueItem> revenueByMonth = new();
 
     protected override async Task OnInitializedAsync()
     {
+        // Load general stats
         var stats = await Api.GetAsync<foodstreet_admin.Models.AdminStatsModel>("admin/stats");
         if (stats != null)
         {
             totalStores = stats.TotalStores;
             totalCustomers = stats.TotalCustomers;
             totalListens = stats.TotalListens;
-            revenue = stats.TotalRevenue;
-            
+            revenueTotal = stats.TotalRevenue;
+
             topStores = stats.TopStores;
             langStats = stats.LangStats;
-            monthlyOverview = stats.MonthlyOverview;
         }
+
+        // Load revenue data
+        await LoadRevenueData();
+    }
+
+    private async Task LoadRevenueData()
+    {
+        isLoadingRevenue = true;
+        StateHasChanged();
+
+        int? month = filterMonth > 0 ? filterMonth : null;
+        var revenueData = await StoreSvc.GetAdminRevenueAsync(month, filterYear);
+
+        if (revenueData != null)
+        {
+            revenueTotal = revenueData.TotalRevenue;
+            revenueByShop = revenueData.RevenueByShop;
+            revenueByMonth = revenueData.RevenueByMonth;
+        }
+        else
+        {
+            revenueByShop = new();
+            revenueByMonth = new();
+        }
+
+        isLoadingRevenue = false;
+        StateHasChanged();
     }
 }

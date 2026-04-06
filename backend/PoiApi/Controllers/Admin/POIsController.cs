@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PoiApi.Data;
 using PoiApi.DTOs.Admin.Requests;
@@ -30,6 +30,20 @@ public class POIsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreatePoiDto dto)
         => Ok(await _poiService.CreateAsync(dto));
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, CreatePoiDto dto)
+    {
+        var result = await _poiService.UpdateAsync(id, dto);
+        return result == null ? NotFound() : Ok(result);
+    }
+
+    [HttpPost("{id}/shops")]
+    public async Task<IActionResult> LinkShops(int id, [FromBody] List<int> shopIds)
+    {
+        var result = await _poiService.LinkShopsAsync(id, shopIds);
+        return result ? Ok(new { message = "Linked successfully" }) : BadRequest();
+    }
 
     [HttpPost("{id}/generate-audio")]
     public async Task<IActionResult> GenerateAudio(

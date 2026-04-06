@@ -110,13 +110,40 @@
                                             <Label Text="{Binding Shop.Name}" FontFamily="PoppinsBold" FontSize="20" TextColor="{StaticResource TextPrimary}" LineBreakMode="TailTruncation" MaxLines="1"/>
                                             <Label Text="{Binding Shop.Description}" FontFamily="PoppinsRegular" FontSize="14" TextColor="{StaticResource TextSecondary}" LineBreakMode="TailTruncation" MaxLines="2"/>
                                             
-                                            <!-- CTA Button -->
-                                            <Border BackgroundColor="#FFF0E6" StrokeShape="RoundRectangle 14" StrokeThickness="0" Padding="14,10" Margin="0,12,0,0" HorizontalOptions="Start">
-                                                <HorizontalStackLayout Spacing="8">
-                                                    <Label Text="🎵" FontSize="15" VerticalOptions="Center"/>
-                                                    <Label Text="Nghe chuyện" FontFamily="PoppinsSemiBold" FontSize="14" TextColor="{StaticResource Primary}" VerticalOptions="Center"/>
-                                                </HorizontalStackLayout>
-                                            </Border>
+                                            <!-- Play Audio Button -->
+                                            <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+                                                <Border Grid.Column="0" BackgroundColor="#FFF0E6" StrokeShape="RoundRectangle 14" StrokeThickness="0" Padding="14,10" HorizontalOptions="Start">
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer 
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:POIListViewModel}}, Path=PlayAudioDirectCommand}" 
+                                                            CommandParameter="{Binding .}"/>
+                                                    </Border.GestureRecognizers>
+                                                    <HorizontalStackLayout Spacing="8">
+                                                        <Label Text="▶" FontSize="14" TextColor="{StaticResource Primary}" VerticalOptions="Center"/>
+                                                        <Label Text="Nghe thuyết minh" FontFamily="PoppinsSemiBold" FontSize="14" TextColor="{StaticResource Primary}" VerticalOptions="Center"/>
+                                                    </HorizontalStackLayout>
+                                                </Border>
+
+                                                <!-- Quick play circle button -->
+                                                <Border Grid.Column="1"
+                                                        BackgroundColor="{StaticResource Primary}" 
+                                                        StrokeShape="RoundRectangle 22" 
+                                                        StrokeThickness="0"
+                                                        WidthRequest="44" HeightRequest="44"
+                                                        HorizontalOptions="End"
+                                                        VerticalOptions="Center">
+                                                    <Border.Shadow>
+                                                        <Shadow Brush="{StaticResource Primary}" Offset="0,4" Radius="8" Opacity="0.3"/>
+                                                    </Border.Shadow>
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer 
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:POIListViewModel}}, Path=PlayAudioDirectCommand}" 
+                                                            CommandParameter="{Binding .}"/>
+                                                    </Border.GestureRecognizers>
+                                                    <Label Text="🎧" FontSize="20" 
+                                                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                                                </Border>
+                                            </Grid>
                                         </VerticalStackLayout>
                                     </Grid>
                                 </Border>

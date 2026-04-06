@@ -30,8 +30,11 @@ namespace PoiApi.Controllers.Admin
                 .Select(u => new
                 {   
                     u.Id,
+                    u.FullName,
                     u.Email,
-                    Role = u.Role.Name
+                    Role = u.Role.Name,
+                    Status = u.IsActive ? "Active" : "Disabled",
+                    RegisteredAt = u.CreatedAt
                 })
                 .ToList();
 
@@ -89,10 +92,48 @@ namespace PoiApi.Controllers.Admin
             var user = _context.Users.Find(id);
             if (user == null) return NotFound("User not found");
 
-            user.IsActive = (status == "Active");
+            user.IsActive = string.Equals(status, "Active", StringComparison.OrdinalIgnoreCase);
             _context.SaveChanges();
 
             return Ok(new { message = "Cập nhật trạng thái thành công" });
+        }
+
+        // DELETE: api/admin/users/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.Shops)
+                    .ThenInclude(s => s.Poi)
+                        .ThenInclude(p => p.Translations)
+                .FirstOrDefaultAsync(u => u.Id == id);
+            if (user == null) return NotFound("User not found");
+
+            if (user.Role != null && user.Role.Name == RoleConstants.Admin)
+            {
+                return StatusCode(403, "Không được phép xóa tài khoản Admin.");
+            }
+
+            // If user is an owner, remove his shops and their POI/POI translations first.
+            // This avoids FK/relationship issues (User -> Shop is Restrict on delete).
+            var shopsToDelete = user.Shops?.ToList() ?? new List<Shop>();
+            foreach (var shop in shopsToDelete)
+            {
+                if (shop.Poi != null)
+                {
+                    // Remove POI translations explicitly before removing POI.
+                    _context.POITranslations.RemoveRange(shop.Poi.Translations);
+                    _context.POIs.Remove(shop.Poi);
+                }
+
+                _context.Shops.Remove(shop);
+            }
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Xóa tài khoản thành công" });
         }
 
         // GET: api/users/me
@@ -148,6 +189,30 @@ namespace PoiApi.Controllers.Admin
             // var poi = new POI { Name = dto.ShopName, OwnerId = owner.Id }
 
             return Ok("Owner created successfully");
+        }
+
+        [HttpPost("seed-customers")]
+        [Authorize(Roles = RoleConstants.Admin)]
+        public IActionResult SeedCustomers()
+        {
+            var customerRole = _context.Roles.FirstOrDefault(r => r.Name == RoleConstants.User);
+            if (customerRole == null) return StatusCode(500, "Customer role not found");
+
+            var existingCount = _context.Users.Count(u => u.RoleId == customerRole.Id);
+            if (existingCount >= 5) return Ok("Dữ liệu khách hàng đã có sẵn.");
+
+            var customers = new List<User>
+            {
+                new User { FullName = "Nguyễn Văn A", Email = "customer.a@example.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"), RoleId = customerRole.Id, IsActive = true, CreatedAt = DateTime.UtcNow.AddDays(-10) },
+                new User { FullName = "Trần Thị B", Email = "customer.b@example.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"), RoleId = customerRole.Id, IsActive = true, CreatedAt = DateTime.UtcNow.AddDays(-5) },
+                new User { FullName = "Lê Hoàng C", Email = "customer.c@example.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"), RoleId = customerRole.Id, IsActive = false, CreatedAt = DateTime.UtcNow.AddDays(-2) },
+                new User { FullName = "Phạm Minh D", Email = "customer.d@example.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"), RoleId = customerRole.Id, IsActive = true, CreatedAt = DateTime.UtcNow.AddDays(-1) }
+            };
+
+            _context.Users.AddRange(customers);
+            _context.SaveChanges();
+
+            return Ok("Đã tạo dữ liệu khách hàng mẫu thành công.");
         }
     }
 }

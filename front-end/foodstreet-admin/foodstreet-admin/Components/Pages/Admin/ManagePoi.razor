@@ -6,27 +6,36 @@
 
 <PageTitle>Quản lý POI</PageTitle>
 
-<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4">
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-6 animate-fade-in-up">
+    <div class="gradient-icon mr-3">
+        <MudIcon Icon="@Icons.Material.Filled.Place" Size="Size.Large" />
+    </div>
     <MudStack Spacing="0">
-        <MudText Typo="Typo.h5" Style="font-weight:700">📍 Quản lý Điểm Thuyết Minh (POI)</MudText>
-        <MudText Typo="Typo.body2" Color="Color.Secondary">CRUD điểm ẩm thực, ảnh, đa ngôn ngữ và liên kết gian hàng</MudText>
+        <MudText Typo="Typo.h5" Style="font-weight:800; letter-spacing: -0.5px">📍 Quản lý Điểm Thuyết Minh (POI)</MudText>
+        <MudText Typo="Typo.body2" Style="color: #64748b; font-weight: 500">Quản lý kho dữ liệu du lịch, audio và hình ảnh đa ngôn ngữ</MudText>
     </MudStack>
     <MudSpacer />
-    <MudButton Variant="Variant.Filled" Color="Color.Primary"
+    <MudButton Variant="Variant.Filled" 
                StartIcon="@Icons.Material.Filled.AddLocationAlt"
-               OnClick="OpenNew">Thêm POI mới</MudButton>
+               OnClick="OpenNew"
+               Class="px-6"
+               Style="background: var(--primary-gradient); color: white; border-radius: 12px; text-transform:none; font-weight:700; height: 48px">
+        Thêm POI mới
+    </MudButton>
 </MudStack>
 
 <!-- Filter bar -->
-<MudPaper Class="pa-4 mb-4" Elevation="1" Style="border-radius:8px">
+<MudPaper Class="glass-card pa-4 mb-6 border-0 animate-fade-in-up delay-1" Elevation="0">
     <MudGrid AlignItems="AlignItems.Center">
-        <MudItem xs="12" md="5">
+        <MudItem xs="12" md="6">
             <MudTextField @bind-Value="_search" Label="Tìm theo tên, địa điểm..."
                           Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
-                          Variant="Variant.Outlined" Dense="true" Immediate="true" Clearable="true" />
+                          Variant="Variant.Outlined" Dense="true" Immediate="true" Clearable="true" 
+                          Style="background: rgba(255,255,255,0.5); border-radius: 10px" />
         </MudItem>
         <MudItem xs="12" md="3">
-            <MudSelect @bind-Value="_filterLang" Label="Ngôn ngữ hiển thị" Variant="Variant.Outlined" Dense="true">
+            <MudSelect @bind-Value="_filterLang" Label="Ngôn ngữ chính" Variant="Variant.Outlined" Dense="true"
+                        Style="background: rgba(255,255,255,0.5); border-radius: 10px">
                 <MudSelectItem Value="@("vi")">🇻🇳 Tiếng Việt</MudSelectItem>
                 <MudSelectItem Value="@("en")">🇬🇧 English</MudSelectItem>
                 <MudSelectItem Value="@("ko")">🇰🇷 한국어</MudSelectItem>
@@ -34,10 +43,13 @@
                 <MudSelectItem Value="@("zh")">🇨🇳 中文</MudSelectItem>
             </MudSelect>
         </MudItem>
-        <MudItem xs="12" md="4" Class="d-flex align-center justify-end">
-            <MudText Typo="Typo.body2" Color="Color.Secondary">
-                <b>@Filtered.Count()</b> điểm POI
-            </MudText>
+        <MudItem xs="12" md="3" Class="d-flex align-center justify-end">
+             <div class="px-4 py-2" style="background: rgba(99, 102, 241, 0.1); border-radius: 20px; color: #4f46e5">
+                <MudText Typo="Typo.body2" Style="font-weight:700">
+                    <MudIcon Icon="@Icons.Material.Filled.Assessment" Size="Size.Small" Class="mr-1" />
+                    @Filtered.Count() POI
+                </MudText>
+             </div>
         </MudItem>
     </MudGrid>
 </MudPaper>
@@ -48,53 +60,54 @@
 }
 
 <!-- POI Table -->
-<MudPaper Elevation="2" Style="border-radius:8px;overflow:hidden">
-    <MudTable Items="@Filtered" Hover="true" Dense="true" Striped="true">
+<MudPaper Elevation="0" Class="glass-card overflow-hidden border-0 animate-fade-in-up delay-2">
+    <MudTable Items="@Filtered" Hover="true" Dense="true" Elevation="0" Class="transparent-table">
         <HeaderContent>
-            <MudTh>Ảnh</MudTh>
-            <MudTh>Tên POI</MudTh>
-            <MudTh>Địa điểm</MudTh>
-            <MudTh>Ngôn ngữ</MudTh>
-            <MudTh>Mô tả</MudTh>
-            <MudTh>Thao tác</MudTh>
+            <MudTh Style="font-weight:700">Ảnh</MudTh>
+            <MudTh Style="font-weight:700">Tên POI</MudTh>
+            <MudTh Style="font-weight:700">Địa điểm</MudTh>
+            <MudTh Style="font-weight:700">Đa ngôn ngữ</MudTh>
+            <MudTh Style="font-weight:700">Mô tả</MudTh>
+            <MudTh Style="font-weight:700">Thao tác</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd>
                 @if (!string.IsNullOrEmpty(context.ImageUrl))
                 {
-                    <MudAvatar Rounded="true" Style="width:48px;height:48px;border-radius:8px">
-                        <MudImage Src="@context.ImageUrl" Fluid="true" />
-                    </MudAvatar>
+                    <div class="pa-1" style="background: white; border-radius: 10px; width: fit-content; box-shadow: 0 2px 8px rgba(0,0,0,0.05)">
+                        <MudImage Src="@context.ImageUrl" Width="50" Height="50" ObjectFit="ObjectFit.Cover" Style="border-radius:8px" />
+                    </div>
                 }
                 else
                 {
-                    <MudAvatar Color="Color.Primary" Rounded="true" Style="width:48px;height:48px;border-radius:8px">
-                        <MudIcon Icon="@Icons.Material.Filled.Place" />
+                    <MudAvatar Color="Color.Primary" Variant="Variant.Outlined" Rounded="true" Style="width:50px;height:50px;border-radius:10px">
+                        <MudIcon Icon="@Icons.Material.Filled.BrokenImage" />
                     </MudAvatar>
                 }
             </MudTd>
             <MudTd>
-                <MudText Typo="Typo.body2" Style="font-weight:600">@context.Name</MudText>
+                <MudText Typo="Typo.body2" Style="font-weight:700; color: #1e293b">@context.Name</MudText>
             </MudTd>
             <MudTd>
                 <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
                     <MudIcon Icon="@Icons.Material.Filled.LocationOn" Size="Size.Small" Color="Color.Secondary" />
-                    <MudText Typo="Typo.body2" Color="Color.Secondary">@(context.Location ?? "—")</MudText>
+                    <MudText Typo="Typo.body2" Style="color: #64748b; font-weight: 500">@(context.Location ?? "—")</MudText>
                 </MudStack>
             </MudTd>
             <MudTd>
                 <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
                     @foreach (var lang in context.Languages)
                     {
-                        <MudChip T="string" Size="Size.Small" Color="Color.Info" Style="height:20px;font-size:10px">
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Filled" 
+                                 Style="@($"background: {GetLangColor(lang)}; color: white; height:20px; font-size:10px; font-weight: 700")">
                             @lang.ToUpper()
                         </MudChip>
                     }
                 </MudStack>
             </MudTd>
             <MudTd>
-                <MudText Typo="Typo.body2" Color="Color.Secondary" Style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
-                    @(context.Description.Length > 60 ? context.Description[..60] + "..." : context.Description)
+                <MudText Typo="Typo.body2" Style="color: #64748b; font-size: 0.8rem; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">
+                    @(context.Description.Length > 80 ? context.Description[..80] + "..." : context.Description)
                 </MudText>
             </MudTd>
             <MudTd>
@@ -393,8 +406,8 @@
         }
         _poiForm = new PoiFormModel
         {
-            Location = poi.Location,
-            ImageUrl = poi.ImageUrl,
+            Location = poi.Location ?? "",
+            ImageUrl = poi.ImageUrl ?? "",
             Translations = translations
         };
         _showPoiDialog = true;
@@ -464,10 +477,17 @@
         }
         else
         {
-            // PUT /api/admin/pois/{id} — add to backend when available
-            Snackbar.Add("Lưu thay đổi thành công! (Demo)", Severity.Success);
-            await LoadPois();
-            _showPoiDialog = false;
+            var result = await Api.PutAsync<object, PoiAdminApiDto>($"admin/pois/{_editingPoi.Id}", payload);
+            if (result != null)
+            {
+                Snackbar.Add("Cập nhật POI thành công!", Severity.Success);
+                await LoadPois();
+                _showPoiDialog = false;
+            }
+            else
+            {
+                Snackbar.Add("Lỗi khi cập nhật POI!", Severity.Error);
+            }
         }
 
         _saving = false;
@@ -531,14 +551,34 @@
 
     private async Task SaveShopLinks()
     {
+        if (_selectedPoi == null) return;
+        
         _saving = true;
-        await Task.Delay(300); // TODO: POST /api/admin/pois/{id}/shops với _linkedShopIds
-        Snackbar.Add($"Đã liên kết {_linkedShopIds.Count} gian hàng vào POI: {_selectedPoi?.Name}", Severity.Success);
-        _showLinkDialog = false;
+        var ok = await Api.PostAsync<object, object>($"admin/pois/{_selectedPoi.Id}/shops", _linkedShopIds);
+        
+        if (ok != null)
+        {
+            Snackbar.Add($"Đã liên kết {_linkedShopIds.Count} gian hàng vào POI: {_selectedPoi?.Name}", Severity.Success);
+            _showLinkDialog = false;
+        }
+        else
+        {
+            Snackbar.Add("Lỗi khi liên kết gian hàng!", Severity.Error);
+        }
         _saving = false;
     }
 
     // ── View Models ──────────────────────────────────────────────────
+    private string GetLangColor(string lang) => lang.ToLower() switch
+    {
+        "vi" => "#ef4444", // Red
+        "en" => "#3b82f6", // Blue
+        "ko" => "#10b981", // Green
+        "ja" => "#f59e0b", // Orange
+        "zh" => "#8b5cf6", // Purple
+        _ => "#64748b"
+    };
+
     private class PoiViewModel
     {
         public int Id { get; set; }

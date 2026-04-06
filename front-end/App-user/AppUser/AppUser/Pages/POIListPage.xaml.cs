@@ -5,6 +5,7 @@ namespace AppUser.Pages
     public partial class POIListPage : ContentPage
     {
         private readonly POIListViewModel _vm;
+        private bool _isMapLoaded;
 
         public POIListPage(POIListViewModel vm)
         {
@@ -12,13 +13,16 @@ namespace AppUser.Pages
             _vm = vm;
             BindingContext = vm;
 
-            LoadMapHtml();
             _vm.FilteredPOIs.CollectionChanged += (s, e) => UpdateMapData();
             _vm.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(POIListViewModel.UserLocation))
                 {
                     UpdateMapData();
+                }
+                else if (e.PropertyName == nameof(POIListViewModel.IsMapView) && _vm.IsMapView && !_isMapLoaded)
+                {
+                    LoadMapHtml();
                 }
             };
         }
@@ -31,10 +35,12 @@ namespace AppUser.Pages
                 using var reader = new System.IO.StreamReader(stream);
                 var html = await reader.ReadToEndAsync();
                 MapWebView.Source = new HtmlWebViewSource { Html = html };
+                _isMapLoaded = true;
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Lỗi tải HTML Bản đồ: {ex.Message}");
+                _vm.IsMapView = false;
             }
         }
 

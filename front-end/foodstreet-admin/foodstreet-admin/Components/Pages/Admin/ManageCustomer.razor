@@ -4,103 +4,131 @@
 @rendermode InteractiveServer
 @using MudBlazor
 @inject foodstreet_admin.Services.StoreService StoreSvc
+@inject ISnackbar Snackbar
 
 <PageTitle>Quản lý Khách tham quan</PageTitle>
 
-<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4">
-    <MudText Typo="Typo.h4">👤 Quản lý Khách tham quan (Customer)</MudText>
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-6 animate-fade-in-up">
+    <div class="gradient-icon mr-3" style="background: var(--accent-gradient)">
+        <MudIcon Icon="@Icons.Material.Filled.People" Size="Size.Large" />
+    </div>
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h5" Style="font-weight:800; letter-spacing: -0.5px">👤 Quản lý Khách tham quan (Customer)</MudText>
+        <MudText Typo="Typo.body2" Style="color: #64748b; font-weight: 500">Theo dõi thông tin người dùng, lịch sử nghe và quản lý trạng thái tài khoản</MudText>
+    </MudStack>
     <MudSpacer />
-    <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.TableChart"
-               Color="Color.Success" Size="Size.Small" OnClick="ExportExcel">
-        Export Excel
+    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.TableChart"
+               OnClick="ExportExcel"
+               Class="px-6"
+               Style="background: #10b981; color: white; border-radius: 12px; text-transform:none; font-weight:700; height: 48px">
+        Xuất file Excel
     </MudButton>    
 </MudStack>
 
 <!-- Filter Bar -->
-<MudPaper Class="pa-3 mb-4" Elevation="1">
+<MudPaper Class="glass-card pa-4 mb-6 border-0 animate-fade-in-up delay-1" Elevation="0">
     <MudGrid AlignItems="AlignItems.Center">
-        <MudItem xs="12" md="4">
-            <MudTextField @bind-Value="searchText" Label="Tìm theo email, số điện thoại..."
+        <MudItem xs="12" md="6">
+            <MudTextField @bind-Value="searchText" Label="Tìm theo tên, email, số điện thoại..."
                           Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
-                          Variant="Variant.Outlined" Dense="true" Immediate="true" />
+                          Variant="Variant.Outlined" Dense="true" Immediate="true"
+                          Style="background: rgba(255,255,255,0.5); border-radius: 10px" />
         </MudItem>
         <MudItem xs="12" md="3">
-            <MudSelect @bind-Value="filterStatus" Label="Trạng thái" Variant="Variant.Outlined" Dense="true">
-                <MudSelectItem Value="@("All")">Tất cả</MudSelectItem>
-                <MudSelectItem Value="@("Active")">Active</MudSelectItem>
-                <MudSelectItem Value="@("Disabled")">Disabled</MudSelectItem>
+            <MudSelect @bind-Value="filterStatus" Label="Trạng thái" Variant="Variant.Outlined" Dense="true"
+                        Style="background: rgba(255,255,255,0.5); border-radius: 10px">
+                <MudSelectItem Value="@("All")">Tất cả khách hàng</MudSelectItem>
+                <MudSelectItem Value="@("Active")">Đang hoạt động</MudSelectItem>
+                <MudSelectItem Value="@("Disabled")">Đã vô hiệu hóa</MudSelectItem>
             </MudSelect>
         </MudItem>
-        <MudItem xs="12" md="2">
-            <MudText Typo="Typo.body2" Color="Color.Secondary">
-                Tổng: <b>@FilteredCustomers.Count()</b> khách
-            </MudText>
+        <MudItem xs="12" md="3" Class="d-flex align-center justify-end">
+             <div class="px-4 py-2" style="background: rgba(99, 102, 241, 0.1); border-radius: 20px; color: #4f46e5">
+                <MudText Typo="Typo.body2" Style="font-weight:700">
+                    <MudIcon Icon="@Icons.Material.Filled.Badge" Size="Size.Small" Class="mr-1" />
+                    @FilteredCustomers.Count() Customers
+                </MudText>
+             </div>
         </MudItem>
     </MudGrid>
 </MudPaper>
 
-<MudPaper Elevation="2">
-    <MudTable Items="@FilteredCustomers" Hover="true" Dense="true" Striped="true"
+<MudPaper Elevation="0" Class="glass-card overflow-hidden border-0 animate-fade-in-up delay-2">
+    <MudTable Items="@FilteredCustomers" Hover="true" Dense="true" Elevation="0" Class="transparent-table"
               MultiSelection="true" @bind-SelectedItems="selectedCustomers">
         <ToolBarContent>
             @if (selectedCustomers.Count > 0)
             {
-                <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center">
-                    <MudText Typo="Typo.body2">Đã chọn: <b>@selectedCustomers.Count</b></MudText>
-                    <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Warning"
+                <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center" Class="pa-2">
+                    <MudText Typo="Typo.body2" Style="font-weight:700">Đã chọn: <span style="color: #4f46e5">@selectedCustomers.Count</span></MudText>
+                    <MudButton Size="Size.Small" Variant="Variant.Filled" 
                                StartIcon="@Icons.Material.Filled.NotificationAdd"
-                               OnClick="SendBulkNotification">
+                               OnClick="SendBulkNotification"
+                               Style="background: var(--secondary-gradient); color: white; border-radius: 8px; text-transform:none">
                         Gửi thông báo hàng loạt
                     </MudButton>
                     <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Error"
                                StartIcon="@Icons.Material.Filled.Block"
-                               OnClick="BulkDisable">
-                        Vô hiệu hóa đã chọn
+                               OnClick="BulkDisable"
+                               Style="border-radius: 8px; text-transform:none">
+                        Vô hiệu hóa
                     </MudButton>
                 </MudStack>
             }
         </ToolBarContent>
         <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<foodstreet_admin.Models.CustomerModel, object>(x => x.FullName)">Họ tên</MudTableSortLabel></MudTh>
-            <MudTh>Email</MudTh>
-            <MudTh>Số điện thoại</MudTh>
-            <MudTh>Trạng thái</MudTh>
-            <MudTh>Tổng lượt nghe</MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<foodstreet_admin.Models.CustomerModel, object>(x => x.RegisteredAt)">Ngày đăng ký</MudTableSortLabel></MudTh>
-            <MudTh>Thao tác</MudTh>
+            <MudTh Style="font-weight:700"><MudTableSortLabel SortBy="new Func<foodstreet_admin.Models.CustomerModel, object>(x => x.FullName)">Khách hàng</MudTableSortLabel></MudTh>
+            <MudTh Style="font-weight:700">Liên hệ</MudTh>
+            <MudTh Style="font-weight:700">Trạng thái</MudTh>
+            <MudTh Style="font-weight:700">Lượt nghe</MudTh>
+            <MudTh Style="font-weight:700"><MudTableSortLabel SortBy="new Func<foodstreet_admin.Models.CustomerModel, object>(x => x.RegisteredAt)">Ngày đăng ký</MudTableSortLabel></MudTh>
+            <MudTh Style="font-weight:700">Thao tác</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd>
-                <MudStack Row="true" AlignItems="AlignItems.Center">
-                    <MudAvatar Size="Size.Small" Color="Color.Info">@context.FullName[0]</MudAvatar>
-                    <MudText Typo="Typo.body2">@context.FullName</MudText>
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                    <MudAvatar Style="background: var(--accent-gradient); color: white; border-radius: 12px">
+                        @(string.IsNullOrEmpty(context.FullName) ? "?" : context.FullName[0].ToString().ToUpper())
+                    </MudAvatar>
+                    <MudText Typo="Typo.body2" Style="font-weight:700; color: #1e293b">@context.FullName</MudText>
                 </MudStack>
             </MudTd>
-            <MudTd>@context.Email</MudTd>
-            <MudTd>@context.Phone</MudTd>
             <MudTd>
-                <MudChip T="string" Size="Size.Small"
-                         Color="@(context.Status == "Active" ? Color.Success : Color.Error)">
-                    @context.Status
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.body2" Style="font-weight:500">@context.Email</MudText>
+                    <MudText Typo="Typo.caption" Style="color: #64748b">@context.Phone</MudText>
+                </MudStack>
+            </MudTd>
+            <MudTd>
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Filled"
+                         Color="@(context.Status == "Active" ? Color.Success : Color.Error)"
+                         Style="font-weight:700; border-radius: 8px">
+                    @context.Status.ToUpper()
                 </MudChip>
             </MudTd>
-            <MudTd>@context.TotalListens.ToString("N0")</MudTd>
-            <MudTd>@context.RegisteredAt.ToString("dd/MM/yyyy")</MudTd>
             <MudTd>
-                <MudStack Row="true" Spacing="1">
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Primary" Style="font-weight:700">
+                    @context.TotalListens.ToString("N0") lượt
+                </MudChip>
+            </MudTd>
+            <MudTd>
+                <MudText Typo="Typo.body2" Style="color: #64748b; font-weight:500">@context.RegisteredAt.ToString("dd/MM/yyyy")</MudText>
+            </MudTd>
+            <MudTd>
+                <MudStack Row="true" Spacing="0">
                     @if (context.Status == "Active")
                     {
-                        <MudIconButton Icon="@Icons.Material.Filled.Block" Size="Size.Small"
+                        <MudIconButton Icon="@Icons.Material.Rounded.Block" Size="Size.Small"
                                        Color="Color.Warning" OnClick="@(() => DisableCustomer(context))"
                                        Title="Vô hiệu hóa (spam)" />
                     }
                     else
                     {
-                        <MudIconButton Icon="@Icons.Material.Filled.LockOpen" Size="Size.Small"
+                        <MudIconButton Icon="@Icons.Material.Rounded.LockOpen" Size="Size.Small"
                                        Color="Color.Success" OnClick="@(() => EnableCustomer(context))"
                                        Title="Kích hoạt lại" />
                     }
-                    <MudIconButton Icon="@Icons.Material.Filled.Email" Size="Size.Small"
+                    <MudIconButton Icon="@Icons.Material.Rounded.Email" Size="Size.Small"
                                    Color="Color.Info" OnClick="@(() => SendNotification(context))"
                                    Title="Gửi thông báo" />
                 </MudStack>
@@ -132,9 +160,11 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="@(() => showNotifyDialog = false)" Variant="Variant.Outlined">Hủy</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="DoSendNotification">
-            Gửi thông báo
-        </MudButton>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Autorenew" Color="Color.Secondary" Variant="Variant.Filled" 
+               OnClick="SeedSampleData" Class="rounded-pill px-6 mr-2">Tạo dữ liệu mẫu</MudButton>
+    <MudButton StartIcon="@Icons.Material.Filled.Email" Color="Color.Primary" Variant="Variant.Filled" 
+               OnClick="SendBulkNotification" Class="rounded-pill px-6 mr-2">Gửi thông báo</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -164,8 +194,33 @@
              c.FullName.Contains(searchText, StringComparison.OrdinalIgnoreCase)) &&
             (filterStatus == "All" || c.Status == filterStatus));
 
-    private void DisableCustomer(foodstreet_admin.Models.CustomerModel c) => c.Status = "Disabled";
-    private void EnableCustomer(foodstreet_admin.Models.CustomerModel c) => c.Status = "Active";
+    private async Task EnableCustomer(foodstreet_admin.Models.CustomerModel c)
+    {
+        var ok = await StoreSvc.UpdateCustomerStatusAsync(c.Id, "Active");
+        if (ok)
+        {
+            c.Status = "Active";
+            Snackbar.Add($"Đã kích hoạt khách hàng: {c.FullName}", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Lỗi khi cập nhật trạng thái!", Severity.Error);
+        }
+    }
+
+    private async Task DisableCustomer(foodstreet_admin.Models.CustomerModel c)
+    {
+        var ok = await StoreSvc.UpdateCustomerStatusAsync(c.Id, "Disabled");
+        if (ok)
+        {
+            c.Status = "Disabled";
+            Snackbar.Add($"Đã vô hiệu hóa khách hàng: {c.FullName}", Severity.Warning);
+        }
+        else
+        {
+            Snackbar.Add("Lỗi khi cập nhật trạng thái!", Severity.Error);
+        }
+    }
 
     private void SendNotification(foodstreet_admin.Models.CustomerModel c)
     {
@@ -173,6 +228,20 @@
         notifyTarget = c;
         notifySubject = notifyMessage = "";
         showNotifyDialog = true;
+    }
+
+    private async Task SeedSampleData()
+    {
+        var ok = await StoreSvc.SeedCustomersAsync();
+        if (ok)
+        {
+            Snackbar.Add("Đã tạo dữ liệu mẫu thành công!", Severity.Success);
+            customers = await StoreSvc.GetCustomersAsync();
+        }
+        else
+        {
+            Snackbar.Add("Có lỗi xảy ra hoặc dữ liệu đã đủ 5 khách hàng.", Severity.Info);
+        }
     }
 
     private void SendBulkNotification()
@@ -183,9 +252,22 @@
         showNotifyDialog = true;
     }
 
-    private void BulkDisable()
+    private async Task BulkDisable()
     {
-        foreach (var c in selectedCustomers) c.Status = "Disabled";
+        int count = 0;
+        foreach (var c in selectedCustomers)
+        {
+            var ok = await StoreSvc.UpdateCustomerStatusAsync(c.Id, "Disabled");
+            if (ok)
+            {
+                c.Status = "Disabled";
+                count++;
+            }
+        }
+        
+        if (count > 0)
+            Snackbar.Add($"Đã vô hiệu hóa {count} khách hàng!", Severity.Warning);
+            
         selectedCustomers.Clear();
     }
 

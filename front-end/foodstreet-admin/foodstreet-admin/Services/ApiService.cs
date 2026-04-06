@@ -81,7 +81,7 @@
                 {
                     var errorBody = await response.Content.ReadAsStringAsync();
                     _logger.LogWarning("POST {Endpoint} returned {StatusCode}: {ErrorBody}", endpoint, response.StatusCode, errorBody);
-                    return default;
+                    throw new HttpRequestException(errorBody, null, response.StatusCode);
                 }
 
                 return await response.Content.ReadFromJsonAsync<TResponse>(_jsonOptions);

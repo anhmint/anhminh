@@ -47,16 +47,20 @@
         </LinearGradientBrush>
     </ContentPage.Background>
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid>
+        <Grid RowDefinitions="Auto,*">
         
-        <!-- MediaElement for playback (hidden) -->
+        <!-- MediaElement for playback (hidden but must be in visual tree) -->
         <toolkit:MediaElement x:Name="MediaElement"
-                               Source="{Binding AudioUrl}"
-                               ShouldAutoPlay="True"
+                               ShouldAutoPlay="False"
                                ShouldShowPlaybackControls="False"
                                PositionChanged="OnMediaElementPositionChanged"
                                StateChanged="OnMediaElementStateChanged"
-                               IsVisible="False" />
+                               MediaFailed="OnMediaElementMediaFailed"
+                               IsVisible="True"
+                               WidthRequest="0"
+                               HeightRequest="0"
+                               Opacity="0" />
 
         <!-- ── TOP BAR (Glassmorphism) ── -->
         <Grid Grid.Row="0" RowDefinitions="Auto,Auto" Padding="16,52,16,16">
@@ -205,10 +209,10 @@
                   VerticalOptions="Center">
 
                 <Button Grid.Column="0"
-                        Text="⏪"
+                        Text="⏮"
                         Style="{StaticResource MediaControlButtonStyle}"
                         Command="{Binding SeekBackwardCommand}"
-                        FontSize="40"
+                        FontSize="36"
                         HorizontalOptions="Center"/>
 
                 <Border Grid.Column="1"
@@ -222,8 +226,9 @@
                     <Button x:Name="PlayPauseBtn"
                             Style="{StaticResource MediaControlButtonStyle}"
                             Command="{Binding TogglePlayPauseCommand}"
+                            Text="▶"
                             TextColor="#0F172A"
-                            FontSize="44"
+                            FontSize="36"
                             WidthRequest="90" HeightRequest="90">
                         <Button.Triggers>
                             <DataTrigger TargetType="Button" Binding="{Binding IsPlaying}" Value="True">
@@ -237,13 +242,108 @@
                 </Border>
 
                 <Button Grid.Column="2"
-                        Text="⏩"
+                        Text="⏭"
                         Style="{StaticResource MediaControlButtonStyle}"
                         Command="{Binding SeekForwardCommand}"
-                        FontSize="40"
+                        FontSize="36"
                         HorizontalOptions="Center"/>
             </Grid>
 
+            <!-- Show Review Button -->
+            <Button Text="⭐ Giúp chúng tôi đánh giá bài thuyết minh"
+                    Command="{Binding ShowReviewCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="#99FFFFFF"
+                    FontFamily="PoppinsMedium"
+                    FontSize="12"
+                    Margin="0,32,0,0"
+                    HorizontalOptions="Center" />
+
         </VerticalStackLayout>
+
+        <!-- In-app fallback player when MediaElement fails -->
+        <Border Grid.Row="1"
+                x:Name="FallbackAudioContainer"
+                IsVisible="False"
+                Margin="16"
+                Padding="12"
+                BackgroundColor="#1AFFFFFF"
+                StrokeShape="RoundRectangle 12"
+                StrokeThickness="0"
+                VerticalOptions="End">
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Trình phát dự phòng"
+                       FontSize="12"
+                       TextColor="#CCFFFFFF"
+                       HorizontalOptions="Center"/>
+                <WebView x:Name="FallbackAudioWebView"
+                         HeightRequest="96"/>
+            </VerticalStackLayout>
+        </Border>
     </Grid>
+
+    <!-- ── REVIEW DIALOG OVERLAY ── -->
+    <Grid IsVisible="{Binding IsReviewDialogVisible}" BackgroundColor="#D9000000">
+        <!-- Review Card -->
+        <Border BackgroundColor="#1E1E3F"
+                StrokeShape="RoundRectangle 24"
+                StrokeThickness="1"
+                Stroke="#33FFFFFF"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                WidthRequest="320"
+                Padding="24">
+            <VerticalStackLayout Spacing="16">
+                
+                <Label Text="Đánh giá Trải nghiệm"
+                       FontSize="18"
+                       FontFamily="PoppinsBold"
+                       TextColor="White"
+                       HorizontalOptions="Center" />
+
+                <!-- Simple Rating Label (Alternatively a Slider for rating) -->
+                <Label Text="Điểm đánh giá (1-5)"
+                       FontSize="12"
+                       FontFamily="PoppinsMedium"
+                       TextColor="#99FFFFFF"/>
+                <Slider Minimum="1" Maximum="5" Value="{Binding ReviewRating}" 
+                        MinimumTrackColor="{StaticResource Primary}" 
+                        MaximumTrackColor="#33FFFFFF"
+                        ThumbColor="White"/>
+                <Label Text="{Binding ReviewRating, StringFormat='{0:F0} Sao'}"
+                       TextColor="{StaticResource Primary}"
+                       FontFamily="PoppinsBold"
+                       HorizontalOptions="Center"/>
+
+                <Editor Placeholder="Bình luận bài thuyết minh..."
+                        Text="{Binding ReviewComment}"
+                        PlaceholderColor="#66FFFFFF"
+                        TextColor="White"
+                        BackgroundColor="#2A2A5A"
+                        HeightRequest="80"
+                        Margin="0,0,0,16" />
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                    <Button Grid.Column="0"
+                            Text="Hủy"
+                            BackgroundColor="Transparent"
+                            TextColor="#99FFFFFF"
+                            BorderColor="#66FFFFFF"
+                            BorderWidth="1"
+                            CornerRadius="12"
+                            Command="{Binding CancelReviewCommand}" />
+                            
+                    <Button Grid.Column="1"
+                            Text="Gửi"
+                            BackgroundColor="{StaticResource Primary}"
+                            TextColor="White"
+                            CornerRadius="12"
+                            Command="{Binding SubmitReviewCommand}" />
+                </Grid>
+                
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+    </Grid>
+
 </ContentPage>

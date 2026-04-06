@@ -39,7 +39,7 @@ public class AuthService
                 request);
 
             if (result == null)
-                return (false, "Email hoặc mật khẩu không đúng!", "");
+                return (false, "Đã xảy ra lỗi khi đăng nhập!", "");
 
             _tokenService.SetToken(result.Token);
 
@@ -61,7 +61,17 @@ public class AuthService
         catch (HttpRequestException ex)
         {
             _logger.LogError(ex, "Login API call failed");
-            return (false, "Không thể kết nối đến server. Vui lòng thử lại!", "");
+            try 
+            {
+                if (!string.IsNullOrEmpty(ex.Message) && ex.Message.Trim().StartsWith("{"))
+                {
+                    var error = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(ex.Message, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (error != null && error.ContainsKey("message"))
+                        return (false, error["message"], "");
+                }
+            }
+            catch { }
+            return (false, "Email hoặc mật khẩu không đúng!", "");
         }
         catch (Exception ex)
         {
@@ -109,10 +119,42 @@ public class AuthService
             await ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     }
 
+    public async Task<(bool Success, string Message)> UpdateProfileAsync(int userId, string fullName, string email)
+    {
+        try
+        {
+            var payload = new { email, fullName };
+            await _api.PutAsync<object, object>("auth/profile", payload);
+            return (true, "Lưu thông tin thành công!");
+        }
+        catch (HttpRequestException ex) when (ex.Message.Contains("400"))
+        {
+            return (false, "Email đã được sử dụng hoặc không hợp lệ!");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "UpdateProfileAsync failed");
+            return (false, "Lỗi server khi lưu thông tin.");
+        }
+    }
+
     public async Task<(bool Success, string Message)> ChangePasswordAsync(int userId, string currentPwd, string newPwd)
     {
-        await Task.Delay(300);
-        return (true, "Đổi mật khẩu thành công!");
+        try
+        {
+            var payload = new { currentPassword = currentPwd, newPassword = newPwd };
+            await _api.PutAsync<object, object>("auth/profile", payload);
+            return (true, "Đổi mật khẩu thành công!");
+        }
+        catch (HttpRequestException ex) when (ex.Message.Contains("400"))
+        {
+            return (false, "Mật khẩu hiện tại không đúng!");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "ChangePasswordAsync failed");
+            return (false, "Lỗi server khi đổi mật khẩu.");
+        }
     }
 }
 public class PendingLoginService

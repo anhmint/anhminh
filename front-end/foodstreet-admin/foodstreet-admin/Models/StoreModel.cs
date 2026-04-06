@@ -10,6 +10,7 @@ public class StoreModel
     public string ImageUrl { get; set; } = "";
     public string? MenuImagesUrl { get; set; }
     public string AudioUrl { get; set; } = "";
+    public Dictionary<string, string> AudioUrls { get; set; } = new();
     public string Category { get; set; } = "";
     public string Status { get; set; } = "Pending"; // Pending | Active | Rejected
     public int SellerId { get; set; }
@@ -40,6 +41,7 @@ public class CustomerModel
     public string FullName { get; set; } = "";
     public string Email { get; set; } = "";
     public string Phone { get; set; } = "";
+    public string Role { get; set; } = "USER";
     public string Status { get; set; } = "Active"; // Active | Disabled
     public DateTime RegisteredAt { get; set; } = DateTime.Now;
     public int TotalListens { get; set; }
@@ -61,4 +63,22 @@ public class ReviewModel
     public string Comment { get; set; } = "";
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public int StoreId { get; set; }
+}
+
+// ── Seller Revenue Models ─────────────────────────────────────────
+public class SellerRevenueModel
+{
+    public string WeekStart { get; set; } = "";
+    public string WeekEnd { get; set; } = "";
+    public decimal TotalRevenue { get; set; }
+    public List<DailyRevenueItem> DailyRevenue { get; set; } = new();
+    public List<ShopRevenueItem> ShopRevenue { get; set; } = new();
+}
+
+public class DailyRevenueItem
+{
+    public string Date { get; set; } = "";
+    public string DayName { get; set; } = "";
+    public decimal Revenue { get; set; }
+    public int OrderCount { get; set; }
 }

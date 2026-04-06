@@ -6,6 +6,7 @@ using PoiApi.Mapping;
 using PoiApi.Models;
 using PoiApi.Services;
 using System.Text;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -89,6 +90,49 @@ using (var scope = app.Services.CreateScope())
 app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
+// Enforce IsActive for all authenticated requests (prevents blocked users from keeping old JWTs)
+app.Use(async (context, next) =>
+{
+    var isAuthenticated = context.User?.Identity?.IsAuthenticated == true;
+    if (!isAuthenticated)
+    {
+        await next();
+        return;
+    }
+
+    var path = context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty;
+    // Avoid interfering with auth flows.
+    if (path.StartsWith("/api/auth/login") ||
+        path.StartsWith("/api/auth/register") ||
+        path.StartsWith("/api/auth/register-user"))
+    {
+        await next();
+        return;
+    }
+
+    var userIdString = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!int.TryParse(userIdString, out var userId))
+    {
+        await next();
+        return;
+    }
+
+    var db = context.RequestServices.GetRequiredService<AppDbContext>();
+    var isActive = await db.Users
+        .Where(u => u.Id == userId)
+        .Select(u => u.IsActive)
+        .FirstOrDefaultAsync();
+
+    if (isActive != true)
+    {
+        context.Response.StatusCode = 403;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync("{\"message\":\"Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ để được hỗ trợ.\"}");
+        return;
+    }
+
+    await next();
+});
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

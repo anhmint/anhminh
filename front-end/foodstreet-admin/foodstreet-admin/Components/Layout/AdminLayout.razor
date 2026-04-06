@@ -4,13 +4,13 @@
 @inject StoreService StoreSvc
 
 <MudLayout>
-    <MudAppBar Elevation="2" Dense="false" Style="background:#1a237e">
+    <MudAppBar Elevation="0" Dense="false" Class="glass-effect sticky-top">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit"
                        Edge="Edge.Start" OnClick="ToggleDrawer" />
         <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="ml-1">
-            <MudIcon Icon="@Icons.Material.Filled.AdminPanelSettings" />
-            <MudText Typo="Typo.h6" Style="font-weight:700">
-                FoodStreet <span style="font-weight:300; opacity:.8">Admin</span>
+            <MudIcon Icon="@Icons.Material.Filled.AdminPanelSettings" Class="gradient-text" Style="font-size: 1.5rem;" />
+            <MudText Typo="Typo.h6" Class="gradient-text" Style="font-weight:800; letter-spacing: -0.5px">
+                FoodStreet <span style="font-weight:300; color: #64748b">Admin</span>
             </MudText>
         </MudStack>
         <MudSpacer />
@@ -35,20 +35,25 @@
     </MudAppBar>
 
     <MudDrawer @bind-Open="_open" ClipMode="DrawerClipMode.Always"
-               Elevation="2" Variant="DrawerVariant.Responsive">
+               Elevation="0" Variant="DrawerVariant.Responsive" Class="glass-effect">
         
         <div class="d-flex flex-column" style="height: 100%;">
             
             <div>
-                <MudDrawerHeader Style="background:#1a237e; padding:16px">
-                    <MudStack Spacing="0">
-                        <MudAvatar Color="Color.Warning" Size="Size.Medium">A</MudAvatar>
-                        <MudText Typo="Typo.body1" Style="font-weight:600; color:white" Class="mt-1">
-                            Quản trị viên
-                        </MudText>
-                        <MudText Typo="Typo.caption" Style="color:rgba(255,255,255,.65)">
-                            Admin Panel
-                        </MudText>
+                <MudDrawerHeader Style="padding:24px 16px">
+                    <MudStack Spacing="1" AlignItems="AlignItems.Center" Row="true" Class="w-100">
+                        <MudAvatar Color="Color.Warning" Size="Size.Large" Class="mud-elevation-4" 
+                                   Style="background: var(--primary-gradient); color: white; font-weight: 700">
+                            AD
+                        </MudAvatar>
+                        <MudStack Spacing="0" Class="ml-2">
+                            <MudText Typo="Typo.body1" Style="font-weight:700; color: #1e293b">
+                                Quản trị viên
+                            </MudText>
+                            <MudText Typo="Typo.caption" Style="color: #64748b; font-weight: 500">
+                                Super Administrator
+                            </MudText>
+                        </MudStack>
                     </MudStack>
                 </MudDrawerHeader>
                 <MudDivider />
@@ -60,6 +65,7 @@
                                 Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
 
                     <MudNavGroup Title="Quản lý" Icon="@Icons.Material.Filled.ManageAccounts" @bind-Expanded="_manageExpanded">
+                        <MudNavLink Href="/admin/manage-user" Icon="@Icons.Material.Filled.Group">Tất cả Người dùng</MudNavLink>
                         <MudNavLink Href="/admin/manage-seller" Icon="@Icons.Material.Filled.SupervisorAccount">
                             <MudStack Row="true" AlignItems="AlignItems.Center">
                                 <MudText>Người bán (Seller)</MudText>
@@ -77,7 +83,6 @@
                         <MudNavLink Href="/admin/manage-customer" Icon="@Icons.Material.Filled.People">Khách tham quan</MudNavLink>
                         <MudNavLink Href="/admin/manage-category" Icon="@Icons.Material.Filled.Category">Danh mục quán</MudNavLink>
                         <MudNavLink Href="/admin/manage-language" Icon="@Icons.Material.Filled.Language">Ngôn ngữ Audio</MudNavLink>
-                        <MudNavLink Href="/admin/manage-service-package" Icon="@Icons.Material.Filled.CardMembership">Gói dịch vụ</MudNavLink>
                         <MudNavLink Href="/admin/usage-history" Icon="@Icons.Material.Filled.History">Lịch sử nghe</MudNavLink>
                     </MudNavGroup>
 

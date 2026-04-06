@@ -9,10 +9,12 @@
 
 <PageTitle>@Lang.T("Dashboard")</PageTitle>
 
-<MudText Typo="Typo.h5" Style="font-weight:700" Class="mb-1">📊 @Lang.T("Dashboard")</MudText>
-<MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-5">
-    @Lang.T("StoreSettings")
-</MudText>
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-6 animate-fade-in-up">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4" Style="font-weight:800" Class="gradient-text">📊 @Lang.T("Dashboard")</MudText>
+        <MudText Typo="Typo.body2" Style="opacity:0.6">@Lang.T("StoreSettings")</MudText>
+    </MudStack>
+</MudStack>
 
 @if (_loading)
 {
@@ -84,10 +86,10 @@
                 <MudSpacer />
                 <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Error"
                            StartIcon="@Icons.Material.Filled.PictureAsPdf" Class="mr-2"
-                           Style="box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2)">PDF</MudButton>
+                           Style="border-radius:12px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2)">PDF</MudButton>
                 <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Success"
                            StartIcon="@Icons.Material.Filled.TableChart"
-                           Style="box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2)">Excel</MudButton>
+                           Style="border-radius:12px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2)">Excel</MudButton>
             </MudStack>
             <MudTable Items="@_stats" Hover="true" Dense="false" Class="mud-table-glass">
                 <HeaderContent>
@@ -120,12 +122,12 @@
                 <MudStack Spacing="3">
                     <MudButton Href="/seller/mystore" Variant="Variant.Filled" Color="Color.Primary"
                                StartIcon="@Icons.Material.Filled.Store" FullWidth="true"
-                               Style="height:48px; box-shadow: 0 6px 15px rgba(99, 102, 241, 0.25)">
+                               Style="height:48px; border-radius:12px; box-shadow: 0 6px 15px rgba(99, 102, 241, 0.25)">
                         @Lang.T("MyStore")
                     </MudButton>
                     <MudButton Href="/seller/mystore" Variant="Variant.Outlined" Color="Color.Success"
                                StartIcon="@Icons.Material.Filled.AddBusiness" FullWidth="true"
-                               Style="height:48px">
+                               Style="height:48px; border-radius:12px">
                         Đăng ký gian hàng mới
                     </MudButton>
                 </MudStack>

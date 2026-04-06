@@ -28,7 +28,7 @@ namespace AppUser.ViewModels
         private bool isEmpty = false;
 
         [ObservableProperty]
-        private bool isMapView = true;
+        private bool isMapView = false;
 
         [ObservableProperty]
         private Location? userLocation;
@@ -192,6 +192,30 @@ namespace AppUser.ViewModels
             {
                 await NavigateToPOIAsync(poi);
             }
+        }
+
+        [RelayCommand]
+        private async Task PlayAudioDirect(POIDto poi)
+        {
+            if (poi == null) return;
+
+            // Fetch full detail to get audio URL
+            var fullPoi = await _poiService.GetPOIByIdAsync(poi.Id, CurrentLanguage);
+            if (fullPoi == null || !fullPoi.AudioGuides.Any())
+            {
+                await Shell.Current.DisplayAlert("Không có audio", "Điểm ẩm thực này chưa có thuyết minh audio.", "OK");
+                return;
+            }
+
+            var guide = _audioService.GetGuideForPOI(fullPoi) ?? fullPoi.AudioGuides.First();
+            _audioService.LoadGuide(guide, fullPoi);
+
+            await Shell.Current.GoToAsync("audioPlayer",
+                new Dictionary<string, object>
+                {
+                    ["AudioGuide"] = guide,
+                    ["POI"] = fullPoi
+                });
         }
 
         [RelayCommand]

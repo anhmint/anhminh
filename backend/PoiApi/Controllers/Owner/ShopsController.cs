@@ -81,6 +81,9 @@ namespace PoiApi.Controllers.Owner
                     AudioUrl = (s.Poi != null && s.Poi.Translations.Any(t => t.LanguageCode == lang)) 
                                 ? s.Poi.Translations.First(t => t.LanguageCode == lang).AudioUrl : 
                                 (s.Poi != null && s.Poi.Translations.Any(t => t.LanguageCode == "vi") ? s.Poi.Translations.First(t => t.LanguageCode == "vi").AudioUrl : ""),
+                    AudioUrls = s.Poi != null 
+                                ? s.Poi.Translations.Where(t => !string.IsNullOrEmpty(t.AudioUrl)).ToDictionary(t => t.LanguageCode, t => t.AudioUrl) 
+                                : new Dictionary<string, string>(),
                     Category = "Mặc định",
                     Status = s.IsActive ? "Active" : "Pending",
                     SellerId = s.OwnerId,
@@ -248,18 +251,149 @@ namespace PoiApi.Controllers.Owner
         
         var audioUrl = await _tts.GenerateAudioAsync(shop.Poi.Id, langCode, textToSpeak);
 
-        if (audioUrl != null)
+        if (!string.IsNullOrEmpty(audioUrl))
         {
             translation.AudioUrl = audioUrl;
+            _context.POITranslations.Update(translation);
             await _context.SaveChangesAsync();
-            return Ok(new { 
-                audioUrl, 
-                name = translation.Name, 
-                description = translation.Description 
-            });
         }
 
-        return StatusCode(500, "Lỗi trong quá trình tạo audio từ Azure Speech Service");
+        return Ok(new { audioUrl, name = translation.Name, description = translation.Description });
     }
+
+    [HttpPost("translate")]
+    public async Task<IActionResult> TranslateText([FromBody] TranslateRequestDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Text)) return BadRequest("Nội dung không được để trống");
+        
+        var translated = await _translator.TranslateAsync(dto.Text, dto.TargetLang);
+        return Ok(new { translatedText = translated ?? dto.Text });
+    }
+
+    /// <summary>
+    /// Generate TTS audio for ALL 3 languages (vi, en, zh) in one shot.
+    /// Automatically translates Vietnamese content to EN & ZH, then generates audio.
+    /// </summary>
+    [HttpPost("{id}/generate-tts-all")]
+    public async Task<IActionResult> GenerateTTSAll(int id, [FromBody] TTSRequestDto? dto = null)
+    {
+        var ownerId = GetCurrentUserId();
+        var shop = await _context.Shops
+            .Include(s => s.Poi)
+                .ThenInclude(p => p.Translations)
+            .FirstOrDefaultAsync(s => s.Id == id && s.OwnerId == ownerId);
+
+        if (shop == null || shop.Poi == null) return NotFound("Gian hàng không tồn tại");
+
+        var poi = shop.Poi;
+        var languages = new[] { "vi", "en", "zh" };
+        var results = new List<object>();
+
+        // Step 1: Ensure Vietnamese translation exists with correct content
+        var viTrans = poi.Translations.FirstOrDefault(t => t.LanguageCode == "vi");
+        if (viTrans == null)
+        {
+            viTrans = new POITranslation
+            {
+                POIId = poi.Id,
+                LanguageCode = "vi",
+                Name = shop.Name,
+                Description = dto?.Text ?? shop.Description ?? ""
+            };
+            _context.POITranslations.Add(viTrans);
+        }
+        else
+        {
+            viTrans.Name = shop.Name;
+            if (!string.IsNullOrWhiteSpace(dto?.Text))
+                viTrans.Description = dto.Text;
+            else if (string.IsNullOrWhiteSpace(viTrans.Description))
+                viTrans.Description = shop.Description ?? "";
+        }
+        await _context.SaveChangesAsync();
+
+        // The base Vietnamese text to translate from
+        var viName = viTrans.Name;
+        var viDescription = viTrans.Description;
+
+        // Step 2: Process each language
+        foreach (var lang in languages)
+        {
+            var translation = poi.Translations.FirstOrDefault(t => t.LanguageCode == lang);
+            bool isNew = false;
+
+            if (translation == null)
+            {
+                isNew = true;
+                translation = new POITranslation
+                {
+                    POIId = poi.Id,
+                    LanguageCode = lang,
+                    Name = viName,
+                    Description = viDescription
+                };
+            }
+
+            // Step 3: Dịch nếu cần
+            if (lang != "vi")
+            {
+                var translatedName = await _translator.TranslateAsync(viName, lang);
+                var translatedDesc = await _translator.TranslateAsync(viDescription, lang);
+
+                // Chống trường hợp dịch thất bại trả về chính nó -> không update
+                if (!string.IsNullOrEmpty(translatedName)) translation.Name = translatedName;
+                if (!string.IsNullOrEmpty(translatedDesc)) translation.Description = translatedDesc;
+            }
+
+            if (isNew) _context.POITranslations.Add(translation);
+            await _context.SaveChangesAsync();
+
+            // Step 4: Tạo audio từ nội dung đã dịch
+            var textToSpeak = $"{translation.Name}. {translation.Description}";
+            var audioUrl = await _tts.GenerateAudioAsync(poi.Id, lang, textToSpeak);
+
+            if (!string.IsNullOrEmpty(audioUrl))
+            {
+                translation.AudioUrl = audioUrl;
+                await _context.SaveChangesAsync();
+
+                results.Add(new
+                {
+                    language = lang,
+                    languageName = GetLangDisplayName(lang),
+                    audioUrl,
+                    name = translation.Name,
+                    description = translation.Description,
+                    success = true
+                });
+            }
+            else
+            {
+                results.Add(new
+                {
+                    language = lang,
+                    languageName = GetLangDisplayName(lang),
+                    audioUrl = (string?)null,
+                    name = translation.Name,
+                    description = translation.Description,
+                    success = false
+                });
+            }
+        }
+
+        return Ok(new
+        {
+            message = "Đã tạo audio thuyết minh cho 3 ngôn ngữ",
+            results
+        });
+    }
+
+    private static string GetLangDisplayName(string code) => code.ToLower() switch
+    {
+        "vi" => "Tiếng Việt",
+        "en" => "English",
+        "zh" => "中文 (Chinese)",
+        _ => code.ToUpper()
+    };
     }
 }

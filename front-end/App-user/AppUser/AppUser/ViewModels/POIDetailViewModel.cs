@@ -10,6 +10,8 @@ namespace AppUser.ViewModels
     {
         private readonly AudioService _audioService;
         private readonly POIService _poiService;
+        private bool _isResolvingAudio;
+        private int? _lastTrackedViewPoiId;
 
         [ObservableProperty]
         private POIDto? pOI;
@@ -45,7 +47,8 @@ namespace AppUser.ViewModels
         {
             _audioService = audio;
             _poiService = poiService;
-            CurrentLanguage = _audioService.CurrentLanguage;
+            CurrentLanguage = "vi";
+            _audioService.SetLanguage("vi");
             UpdateLocalization();
         }
 
@@ -91,20 +94,59 @@ namespace AppUser.ViewModels
                 HasAudio = CurrentAudioGuide != null;
                 OnPropertyChanged(nameof(DisplayName));
                 OnPropertyChanged(nameof(DisplayDescription));
+
+                // Track view once per POI detail open/change.
+                if (_lastTrackedViewPoiId != value.Id)
+                {
+                    _lastTrackedViewPoiId = value.Id;
+                    _ = _poiService.TrackViewAsync(value.Id);
+                }
+
+                // Resolve Vietnamese audio once, without mutating POI again (avoid recursion loop).
+                _ = EnsureVietnameseAudioAsync(value.Id);
             }
+        }
+
+        public async Task InitializeAsync()
+        {
+            if (POI == null) return;
+            await EnsureVietnameseAudioAsync(POI.Id);
         }
 
         [RelayCommand]
         private async Task PlayAudioAsync()
         {
-            if (POI == null || CurrentAudioGuide == null) return;
+            if (POI == null) return;
 
-            _audioService.LoadGuide(CurrentAudioGuide, POI);
+            var guide = CurrentAudioGuide;
+            if (guide == null)
+            {
+                var latestPoi = await _poiService.GetPOIByIdAsync(POI.Id, "vi") ?? POI;
+                guide = latestPoi.AudioGuides.FirstOrDefault(g => g.LanguageCode == "vi")
+                    ?? latestPoi.AudioGuides.FirstOrDefault();
+                if (guide != null)
+                {
+                    POI = latestPoi;
+                    CurrentAudioGuide = guide;
+                    HasAudio = true;
+                }
+            }
+
+            if (guide == null) return;
+
+            var audioUrl = AppConfig.ResolveUrl(guide.AudioUrl);
+            if (string.IsNullOrWhiteSpace(audioUrl))
+            {
+                await Shell.Current.DisplayAlert("Lỗi audio", "Không tìm thấy file thuyết minh tiếng Việt.", "OK");
+                return;
+            }
+
+            _audioService.LoadGuide(guide, POI);
 
             await Shell.Current.GoToAsync("audioPlayer",
                 new Dictionary<string, object>
                 {
-                    ["AudioGuide"] = CurrentAudioGuide,
+                    ["AudioGuide"] = guide,
                     ["POI"] = POI
                 });
         }
@@ -112,35 +154,39 @@ namespace AppUser.ViewModels
         [RelayCommand]
         private async Task ToggleLanguageAsync()
         {
-            CurrentLanguage = CurrentLanguage switch
-            {
-                "vi" => "en",
-                "en" => "zh",
-                _ => "vi"
-            };
-            UpdateLocalization();
-            
-            if (POI != null)
-            {
-                // Refresh data from API for the new language
-                var updatedPOI = await _poiService.GetPOIByIdAsync(POI.Id, CurrentLanguage);
-                if (updatedPOI != null)
-                {
-                    POI = updatedPOI;
-                }
-
-                CurrentAudioGuide = _audioService.GetGuideForPOI(POI!);
-                HasAudio = CurrentAudioGuide != null;
-            }
-            
-            OnPropertyChanged(nameof(DisplayName));
-            OnPropertyChanged(nameof(DisplayDescription));
+            await Shell.Current.DisplayAlert("Thông báo", "Hiện tại app đang ưu tiên phát thuyết minh tiếng Việt mặc định.", "OK");
         }
 
         [RelayCommand]
         private async Task GoBackAsync()
         {
             await Shell.Current.GoToAsync("..");
+        }
+
+        private async Task EnsureVietnameseAudioAsync(int poiId)
+        {
+            if (_isResolvingAudio) return;
+            try
+            {
+                _isResolvingAudio = true;
+                var latestPoi = await _poiService.GetPOIByIdAsync(poiId, "vi");
+                if (latestPoi == null) return;
+
+                var viGuide = latestPoi.AudioGuides.FirstOrDefault(g => g.LanguageCode == "vi")
+                    ?? latestPoi.AudioGuides.FirstOrDefault();
+                if (viGuide == null) return;
+
+                CurrentAudioGuide = viGuide;
+                HasAudio = true;
+            }
+            catch
+            {
+                // Keep current state when network is unavailable.
+            }
+            finally
+            {
+                _isResolvingAudio = false;
+            }
         }
     }
 }

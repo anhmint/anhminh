@@ -4,53 +4,62 @@
 @using MudBlazor
 @inject foodstreet_admin.Services.ApiService Api
 @inject foodstreet_admin.Services.StoreService StoreSvc
+@inject ISnackbar Snackbar
 
 <PageTitle>Admin Dashboard</PageTitle>
 
 <MudText Typo="Typo.h4" Class="mb-4">🛡️ Admin Dashboard</MudText>
 
 <!-- Summary Cards -->
-<MudGrid Class="mb-4">
-    <MudItem xs="6" md="3">
-        <MudPaper Class="pa-4" Elevation="2" Style="border-left: 4px solid #1976d2;">
+<MudGrid Class="mb-6">
+    <MudItem xs="6" md="3" Class="animate-fade-in-up delay-1">
+        <MudPaper Pa="0" Class="glass-card pa-4 overflow-hidden border-0" Elevation="0">
             <MudStack Row="true" AlignItems="AlignItems.Center">
-                <MudIcon Icon="@Icons.Material.Filled.Store" Color="Color.Primary" Size="Size.Large" />
+                <div class="gradient-icon mr-3">
+                    <MudIcon Icon="@Icons.Material.Filled.Store" Size="Size.Large" />
+                </div>
                 <MudStack Spacing="0">
-                    <MudText Typo="Typo.h5" Color="Color.Primary"><b>@totalStores</b></MudText>
-                    <MudText Typo="Typo.caption">Tổng gian hàng</MudText>
+                    <MudText Typo="Typo.h5" Style="font-weight:800">@totalStores</MudText>
+                    <MudText Typo="Typo.caption" Style="color: #64748b; font-weight: 500">Tổng gian hàng</MudText>
                 </MudStack>
             </MudStack>
         </MudPaper>
     </MudItem>
-    <MudItem xs="6" md="3">
-        <MudPaper Class="pa-4" Elevation="2" Style="border-left: 4px solid #f57c00;">
+    <MudItem xs="6" md="3" Class="animate-fade-in-up delay-2">
+        <MudPaper Pa="0" Class="glass-card pa-4 overflow-hidden border-0" Elevation="0">
             <MudStack Row="true" AlignItems="AlignItems.Center">
-                <MudIcon Icon="@Icons.Material.Filled.HourglassTop" Color="Color.Warning" Size="Size.Large" />
+                <div class="gradient-icon mr-3" style="background: var(--secondary-gradient)">
+                    <MudIcon Icon="@Icons.Material.Filled.HourglassTop" Size="Size.Large" />
+                </div>
                 <MudStack Spacing="0">
-                    <MudText Typo="Typo.h5" Color="Color.Warning"><b>@pendingStores</b></MudText>
-                    <MudText Typo="Typo.caption">Chờ duyệt</MudText>
+                    <MudText Typo="Typo.h5" Style="font-weight:800; color: #f59e0b">@pendingStores</MudText>
+                    <MudText Typo="Typo.caption" Style="color: #64748b; font-weight: 500">Chờ duyệt</MudText>
                 </MudStack>
             </MudStack>
         </MudPaper>
     </MudItem>
-    <MudItem xs="6" md="3">
-        <MudPaper Class="pa-4" Elevation="2" Style="border-left: 4px solid #388e3c;">
+    <MudItem xs="6" md="3" Class="animate-fade-in-up delay-3">
+        <MudPaper Pa="0" Class="glass-card pa-4 overflow-hidden border-0" Elevation="0">
             <MudStack Row="true" AlignItems="AlignItems.Center">
-                <MudIcon Icon="@Icons.Material.Filled.People" Color="Color.Success" Size="Size.Large" />
+                <div class="gradient-icon mr-3" style="background: var(--accent-gradient)">
+                    <MudIcon Icon="@Icons.Material.Filled.People" Size="Size.Large" />
+                </div>
                 <MudStack Spacing="0">
-                    <MudText Typo="Typo.h5" Color="Color.Success"><b>@totalCustomers</b></MudText>
-                    <MudText Typo="Typo.caption">Khách đăng ký</MudText>
+                    <MudText Typo="Typo.h5" Style="font-weight:800">@totalCustomers</MudText>
+                    <MudText Typo="Typo.caption" Style="color: #64748b; font-weight: 500">Khách đăng ký</MudText>
                 </MudStack>
             </MudStack>
         </MudPaper>
     </MudItem>
-    <MudItem xs="6" md="3">
-        <MudPaper Class="pa-4" Elevation="2" Style="border-left: 4px solid #7b1fa2;">
+    <MudItem xs="6" md="3" Class="animate-fade-in-up delay-4">
+        <MudPaper Pa="0" Class="glass-card pa-4 overflow-hidden border-0" Elevation="0">
             <MudStack Row="true" AlignItems="AlignItems.Center">
-                <MudIcon Icon="@Icons.Material.Filled.Headphones" Color="Color.Secondary" Size="Size.Large" />
+                <div class="gradient-icon mr-3" style="background: var(--primary-gradient)">
+                    <MudIcon Icon="@Icons.Material.Filled.Headphones" Size="Size.Large" />
+                </div>
                 <MudStack Spacing="0">
-                    <MudText Typo="Typo.h5" Color="Color.Secondary"><b>@totalListens.ToString("N0")</b></MudText>
-                    <MudText Typo="Typo.caption">Lượt nghe audio</MudText>
+                    <MudText Typo="Typo.h5" Style="font-weight:800">@totalListens.ToString("N0")</MudText>
+                    <MudText Typo="Typo.caption" Style="color: #64748b; font-weight: 500">Lượt nghe audio</MudText>
                 </MudStack>
             </MudStack>
         </MudPaper>
@@ -59,62 +68,79 @@
 
 <MudGrid>
     <!-- Pending Approvals -->
-    <MudItem xs="12" md="6">
-        <MudPaper Class="pa-4" Elevation="2">
-            <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-3">
-                <MudText Typo="Typo.h6">⏳ Gian hàng chờ duyệt</MudText>
-                <MudBadge Content="@pendingList.Count" Color="Color.Warning" Class="ml-2">
-                    <MudIcon Icon="@Icons.Material.Filled.Notifications" />
-                </MudBadge>
+    <MudItem xs="12" md="6" Class="animate-fade-in-up delay-2">
+        <MudPaper Class="glass-card pa-5 border-0" Elevation="0">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4">
+                <MudIcon Icon="@Icons.Material.Filled.Timer" Color="Color.Warning" Class="mr-2" />
+                <MudText Typo="Typo.h6" Style="font-weight:700">Gian hàng chờ duyệt</MudText>
+                <MudBadge Content="@pendingList.Count" Color="Color.Warning" Overlap="true" Class="ml-2" />
                 <MudSpacer />
-                <MudButton Href="/admin/manage-seller" Size="Size.Small" Variant="Variant.Text" Color="Color.Primary">
+                <MudButton Href="/admin/manage-seller" Size="Size.Small" Variant="Variant.Text" 
+                           Color="Color.Primary" Style="text-transform:none; font-weight:600">
                     Xem tất cả
                 </MudButton>
             </MudStack>
-            @foreach (var item in pendingList.Take(4))
-            {
-                <MudPaper Class="pa-3 mb-2" Elevation="1" Style="background:#fffde7">
-                    <MudStack Row="true" AlignItems="AlignItems.Center">
-                        <MudStack Spacing="0" Style="flex:1">
-                            <MudText Typo="Typo.body2"><b>@item.StoreName</b></MudText>
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                Seller: @item.SellerName | @item.Date
-                            </MudText>
+            
+            <div style="max-height: 400px; overflow-y: auto;">
+                @if (!pendingList.Any())
+                {
+                    <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="border-dashed">
+                        Tuyệt vời! Không có gian hàng nào chờ duyệt.
+                    </MudAlert>
+                }
+                @foreach (var item in pendingList.Take(5))
+                {
+                    <MudPaper Class="pa-4 mb-3 border-0" Style="background: rgba(249, 250, 251, 0.5); border-radius: 12px">
+                        <MudStack Row="true" AlignItems="AlignItems.Center">
+                            <MudAvatar Color="Color.Info" Variant="Variant.Outlined" Size="Size.Medium" Class="mr-2">
+                                @item.StoreName[0]
+                            </MudAvatar>
+                            <MudStack Spacing="0" Style="flex:1">
+                                <MudText Typo="Typo.body2" Style="font-weight:700">@item.StoreName</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary" Style="font-weight:500">
+                                    Seller: <span style="color: #4b5563">@item.SellerName</span> • @item.Date
+                                </MudText>
+                            </MudStack>
+                            <MudStack Row="true">
+                                <MudIconButton Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success"
+                                               Size="Size.Medium" OnClick="@(() => ApproveStore(item))" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Cancel" Color="Color.Error"
+                                               Size="Size.Medium" OnClick="@(() => RejectStore(item))" />
+                            </MudStack>
                         </MudStack>
-                        <MudIconButton Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success"
-                                       Size="Size.Small" OnClick="@(() => ApproveStore(item))" />
-                        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Color="Color.Error"
-                                       Size="Size.Small" OnClick="@(() => RejectStore(item))" />
-                    </MudStack>
-                </MudPaper>
-            }
+                    </MudPaper>
+                }
+            </div>
         </MudPaper>
     </MudItem>
 
     <!-- Revenue & Stats -->
-    <MudItem xs="12" md="6">
-        <MudPaper Class="pa-4" Elevation="2">
-            <MudText Typo="Typo.h6" Class="mb-3">💰 Doanh thu & Thống kê</MudText>
-            <MudTable Items="@revenueStats" Hover="true" Dense="true" Striped="true">
+    <MudItem xs="12" md="6" Class="animate-fade-in-up delay-3">
+        <MudPaper Class="glass-card pa-5 border-0" Elevation="0">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4">
+                <MudIcon Icon="@Icons.Material.Filled.BarChart" Color="Color.Primary" Class="mr-2" />
+                <MudText Typo="Typo.h6" Style="font-weight:700">Doanh thu & Thống kê</MudText>
+                <MudSpacer />
+                <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                   <MudMenuItem Icon="@Icons.Material.Filled.PictureAsPdf">Xuất PDF</MudMenuItem>
+                   <MudMenuItem Icon="@Icons.Material.Filled.TableChart">Xuất CSV</MudMenuItem>
+                </MudMenu>
+            </MudStack>
+            
+            <MudTable Items="@revenueStats" Hover="true" Dense="true" Elevation="0" Class="transparent-table">
                 <HeaderContent>
-                    <MudTh>Tháng</MudTh>
-                    <MudTh>Gian hàng mới</MudTh>
-                    <MudTh>Khách mới</MudTh>
-                    <MudTh>Lượt nghe</MudTh>
+                    <MudTh Style="font-weight:700">Tháng</MudTh>
+                    <MudTh Style="font-weight:700">Gian hàng</MudTh>
+                    <MudTh Style="font-weight:700">Khách mới</MudTh>
+                    <MudTh Style="font-weight:700">Lượt nghe</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd>@context.Month</MudTd>
-                    <MudTd>@context.NewStores</MudTd>
-                    <MudTd>@context.NewCustomers</MudTd>
-                    <MudTd>@context.Listens</MudTd>
+                    <MudTd><MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Text">+@context.NewStores</MudChip></MudTd>
+                    <MudTd><MudText Typo="Typo.body2" Style="font-weight:600">@context.NewCustomers</MudText></MudTd>
+                    <MudTd><MudText Typo="Typo.body2" Color="Color.Primary">@context.Listens.ToString("N0")</MudText></MudTd>
                 </RowTemplate>
             </MudTable>
-            <MudStack Row="true" Class="mt-3" Spacing="2">
-                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.PictureAsPdf"
-                           Color="Color.Error" Size="Size.Small">CSV</MudButton>
-                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.TableChart"
-                           Color="Color.Success" Size="Size.Small">PDF</MudButton>
-            </MudStack>
         </MudPaper>
     </MudItem>
 
@@ -183,17 +209,33 @@
                             .ToList();
     }
 
-    private void ApproveStore(PendingItem item)
+    private async Task ApproveStore(PendingItem item)
     {
-        // Future: call API
-        pendingList.Remove(item);
-        pendingStores = pendingList.Count;
+        var ok = await Api.PatchAsync($"admin/shops/{item.Id}/approve");
+        if (ok)
+        {
+            pendingList.Remove(item);
+            pendingStores = pendingList.Count;
+            Snackbar.Add($"Đã duyệt gian hàng: {item.StoreName}", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Lỗi khi duyệt gian hàng!", Severity.Error);
+        }
     }
 
-    private void RejectStore(PendingItem item)
+    private async Task RejectStore(PendingItem item)
     {
-        // Future: call API
-        pendingList.Remove(item);
-        pendingStores = pendingList.Count;
+        var ok = await Api.PatchAsync($"admin/shops/{item.Id}/reject");
+        if (ok)
+        {
+            pendingList.Remove(item);
+            pendingStores = pendingList.Count;
+            Snackbar.Add($"Đã từ chối gian hàng: {item.StoreName}", Severity.Warning);
+        }
+        else
+        {
+            Snackbar.Add("Lỗi khi từ chối gian hàng!", Severity.Error);
+        }
     }
 }

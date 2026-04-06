@@ -1,15 +1,18 @@
 using AppUser.Models;
 using System.Net.Http.Json;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace AppUser.Services
 {
     public class POIService
     {
         private readonly HttpClient _http;
+        private readonly AuthService _authService;
 
-        public POIService()
+        public POIService(AuthService authService)
         {
+            _authService = authService;
             _http = new HttpClient
             {
                 BaseAddress = new Uri(AppConfig.BaseApiUrl)
@@ -23,7 +26,7 @@ namespace AppUser.Services
                 var response = await _http.GetFromJsonAsync<List<AppPoiListDto>>($"app/pois?lang={lang}");
                 if (response == null) return new();
 
-                return response.Select(MapToListDto).ToList();
+                return response.Select(x => MapToListDto(x, lang)).ToList();
             }
             catch (Exception ex)
             {
@@ -45,7 +48,7 @@ namespace AppUser.Services
                 var response = await _http.GetFromJsonAsync<AppPoiDetailDto>($"app/pois/{id}?lang={lang}");
                 if (response == null) return null;
 
-                return MapToDetailDto(response);
+                return MapToDetailDto(response, lang);
             }
             catch (Exception ex)
             {
@@ -61,7 +64,7 @@ namespace AppUser.Services
                 var response = await _http.GetFromJsonAsync<List<AppPoiListDto>>($"app/pois?lang={lang}&search={query}");
                 if (response == null) return new();
 
-                return response.Select(MapToListDto).ToList();
+                return response.Select(x => MapToListDto(x, lang)).ToList();
             }
             catch (Exception ex)
             {
@@ -70,7 +73,113 @@ namespace AppUser.Services
             }
         }
 
-        private POIDto MapToListDto(AppPoiListDto api)
+        public async Task<bool> TrackViewAsync(int poiId)
+        {
+            try
+            {
+                var response = await _http.PostAsync($"app/pois/{poiId}/view", null);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error tracking view: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> TrackListenAsync(int poiId)
+        {
+            try
+            {
+                ApplyAuthorizationHeaderIfAvailable();
+                var deviceId = DeviceInfo.Current.Idiom.ToString() + "_" + DeviceInfo.Current.Platform.ToString();
+                var response = await _http.PostAsync($"app/pois/{poiId}/listen?deviceId={deviceId}", null);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error tracking listen: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> SubmitReviewAsync(int poiId, int rating, string comment, string customerName = "Khách hàng")
+            => (await SubmitReviewWithResultAsync(poiId, rating, comment, customerName)).Success;
+
+        public async Task<(bool Success, string? Message)> SubmitReviewWithResultAsync(
+            int poiId,
+            int rating,
+            string comment,
+            string customerName = "Khách hàng")
+        {
+            try
+            {
+                ApplyAuthorizationHeaderIfAvailable();
+                var dto = new AppReviewDto
+                {
+                    Rating = rating,
+                    Comment = comment,
+                    CustomerName = _authService.CurrentUser?.FullName ?? customerName
+                };
+                var response = await _http.PostAsJsonAsync($"app/pois/{poiId}/reviews", dto);
+                if (response.IsSuccessStatusCode) return (true, null);
+
+                var responseText = await response.Content.ReadAsStringAsync();
+                if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                {
+                    var parsedMessage = TryExtractMessage(responseText);
+                    return (false, parsedMessage ?? "Bạn cần nghe POI trước khi gửi đánh giá.");
+                }
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    return (false, "Bạn cần đăng nhập để gửi đánh giá.");
+                }
+
+                return (false, TryExtractMessage(responseText) ?? "Không thể gửi đánh giá.");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error submitting review: {ex.Message}");
+                return (false, "Không thể kết nối đến máy chủ.");
+            }
+        }
+
+        private static string? TryExtractMessage(string responseText)
+        {
+            if (string.IsNullOrWhiteSpace(responseText)) return null;
+            try
+            {
+                var payload = JsonSerializer.Deserialize<ApiErrorPayload>(responseText, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+                return payload?.Message;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private sealed class ApiErrorPayload
+        {
+            public string? Message { get; set; }
+        }
+
+        private void ApplyAuthorizationHeaderIfAvailable()
+        {
+            var token = _authService.Token;
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                _http.DefaultRequestHeaders.Authorization = null;
+                return;
+            }
+
+            _http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        }
+
+        private POIDto MapToListDto(AppPoiListDto api, string lang)
         {
             var poi = new POIDto
             {
@@ -90,7 +199,7 @@ namespace AppUser.Services
                     POIId = api.Id,
                     AudioUrl = AppConfig.ResolveUrl(api.AudioUrl),
                     Title = "Thuyết minh " + api.Name,
-                    LanguageCode = "vi",
+                    LanguageCode = lang,
                     DurationSeconds = 120 // Default placeholder
                 });
             }
@@ -98,7 +207,7 @@ namespace AppUser.Services
             return poi;
         }
 
-        private POIDto MapToDetailDto(AppPoiDetailDto api)
+        private POIDto MapToDetailDto(AppPoiDetailDto api, string lang)
         {
             var poi = new POIDto
             {
@@ -120,7 +229,7 @@ namespace AppUser.Services
                 POIId = api.Id,
                 Name = api.Name,
                 Description = api.Description,
-                LanguageCode = string.Empty // This will be the "current" requested language
+                LanguageCode = lang
             });
 
             if (!string.IsNullOrEmpty(api.AudioUrl))
@@ -130,7 +239,7 @@ namespace AppUser.Services
                     POIId = api.Id,
                     AudioUrl = AppConfig.ResolveUrl(api.AudioUrl),
                     Title = "Thuyết minh " + api.Name,
-                    LanguageCode = "vi"
+                    LanguageCode = lang
                 });
             }
 

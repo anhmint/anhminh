@@ -7,12 +7,16 @@
 
 <PageTitle>Cài đặt Profile</PageTitle>
 
-<MudText Typo="Typo.h5" Style="font-weight:700" Class="mb-1">👤 Cài đặt Profile</MudText>
-<MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-5">Quản lý thông tin cá nhân</MudText>
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-6 animate-fade-in-up">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4" Style="font-weight:800" Class="gradient-text">👤 Cài đặt Profile</MudText>
+        <MudText Typo="Typo.body2" Style="opacity:0.6">Quản lý thông tin cá nhân</MudText>
+    </MudStack>
+</MudStack>
 
 <MudGrid>
     <MudItem xs="12" md="4">
-        <MudPaper Class="pa-5 text-center mb-4" Elevation="2" Style="border-radius:12px">
+        <MudPaper Class="pa-5 text-center mb-4 glass-card animate-fade-in-up" Elevation="0">
             <MudAvatar Style="width:90px;height:90px;font-size:2.5rem;margin:0 auto 12px" Color="Color.Primary">
                 @(_name.Length > 0 ? _name[0] : 'U')
             </MudAvatar>
@@ -31,7 +35,7 @@
             </MudStack>
         </MudPaper>
 
-        <MudPaper Class="pa-4" Elevation="2" Style="border-radius:12px">
+        <MudPaper Class="pa-4 glass-card animate-fade-in-up delay-1" Elevation="0">
             <MudText Typo="Typo.subtitle2" Style="font-weight:600" Class="mb-3">📋 Lịch sử đăng ký</MudText>
             @foreach (var log in _logs)
             {
@@ -49,7 +53,7 @@
 
     <MudItem xs="12" md="8">
         <!-- Personal Info -->
-        <MudPaper Class="pa-5 mb-4" Elevation="2" Style="border-radius:12px">
+        <MudPaper Class="pa-5 mb-4 glass-card animate-fade-in-up delay-2" Elevation="0">
             <MudText Typo="Typo.subtitle1" Style="font-weight:600" Class="mb-4">✏️ Thông tin cá nhân</MudText>
             <MudGrid>
                 <MudItem xs="12" md="6">
@@ -68,14 +72,14 @@
             </MudGrid>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4"
                        StartIcon="@Icons.Material.Filled.Save" OnClick="SaveProfile"
-                       Disabled="_savingProfile">
+                       Disabled="_savingProfile" Style="border-radius:12px; box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3)">
                 @if (_savingProfile) { <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" /> }
                 Lưu thông tin
             </MudButton>
         </MudPaper>
 
         <!-- Change Password -->
-        <MudPaper Class="pa-5" Elevation="2" Style="border-radius:12px">
+        <MudPaper Class="pa-5 glass-card animate-fade-in-up delay-3" Elevation="0">
             <MudText Typo="Typo.subtitle1" Style="font-weight:600" Class="mb-4">🔑 Đổi mật khẩu</MudText>
             <MudGrid>
                 <MudItem xs="12">
@@ -95,7 +99,7 @@
             </MudGrid>
             <MudButton Variant="Variant.Outlined" Color="Color.Warning" Class="mt-4"
                        StartIcon="@Icons.Material.Filled.Lock" OnClick="ChangePwd"
-                       Disabled="_savingPwd">
+                       Disabled="_savingPwd" Style="border-radius:12px">
                 @if (_savingPwd) { <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" /> }
                 Đổi mật khẩu
             </MudButton>
@@ -136,7 +140,6 @@
 
     private async Task SaveProfile()
     {
-        // Nếu ID bằng 0, báo lỗi đỏ lên màn hình thay vì im lặng
         if (_currentUserId == 0) 
         {
             Snackbar.Add("Lỗi: Không nhận diện được ID tài khoản của bạn!", Severity.Error);
@@ -145,18 +148,8 @@
         
         _savingProfile = true;
         
-        // Tạm thời mô phỏng việc gọi API mất 0.5s
-        await Task.Delay(500);
-        bool ok = true; 
-        
-        if (ok)
-        {
-            Snackbar.Add("Lưu thành công!", Severity.Success);
-        }
-        else
-        {
-            Snackbar.Add("Lỗi khi lưu thông tin!", Severity.Error);
-        }
+        var (ok, msg) = await AuthSvc.UpdateProfileAsync(_currentUserId, _name, _email);
+        Snackbar.Add(msg, ok ? Severity.Success : Severity.Error);
         
         _savingProfile = false;
     }

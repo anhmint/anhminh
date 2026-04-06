@@ -35,7 +35,10 @@ public class AuthController : ControllerBase
 
         if (user == null ||
             !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
-            return Unauthorized();
+            return Unauthorized(new { message = "Email hoặc mật khẩu không đúng." });
+
+        if (!user.IsActive)
+            return Unauthorized(new { message = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ để được hỗ trợ." });
 
         var token = GenerateToken(user);
         return Ok(new { token, role = user.Role.Name, fullName = user.FullName, email = user.Email, userId = user.Id });
@@ -72,18 +75,18 @@ public class AuthController : ControllerBase
         var user = _context.Users.FirstOrDefault(u => u.Id == userId);
         if (user == null) return NotFound("User not found");
 
-        if (!dto.Email.EndsWith("@example.com"))
+        if (!string.IsNullOrWhiteSpace(dto.Email))
         {
-            return BadRequest("Email phải có đuôi @example.com");
+            if (user.Email != dto.Email && _context.Users.Any(u => u.Email == dto.Email && u.Id != userId))
+            {
+                return BadRequest("Email đã được sử dụng bởi người khác.");
+            }
+            user.Email = dto.Email;
+            if (!string.IsNullOrWhiteSpace(dto.FullName))
+            {
+                user.FullName = dto.FullName;
+            }
         }
-
-        if (user.Email != dto.Email && _context.Users.Any(u => u.Email == dto.Email && u.Id != userId))
-        {
-            return BadRequest("Email đã được sử dụng bởi người khác.");
-        }
-
-        user.FullName = dto.FullName;
-        user.Email = dto.Email;
 
         if (!string.IsNullOrEmpty(dto.NewPassword))
         {

@@ -15,6 +15,7 @@ namespace PoiApi.Data
         public DbSet<POITranslation> POITranslations => Set<POITranslation>();
 
         public DbSet<Shop> Shops { get; set; }
+        public DbSet<Review> Reviews => Set<Review>();
 
         public DbSet<Menu> Menus => Set<Menu>();
         public DbSet<MenuItem> MenuItems => Set<MenuItem>();
@@ -25,6 +26,7 @@ namespace PoiApi.Data
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Language> Languages => Set<Language>();
         public DbSet<UsageHistory> UsageHistories => Set<UsageHistory>();
+        public DbSet<Order> Orders => Set<Order>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -89,6 +91,14 @@ namespace PoiApi.Data
                 .HasIndex(l => l.Code)
                 .IsUnique();
 
+            // ── Order relation ───────────────────────────────────────
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Shop)
+                .WithMany()
+                .HasForeignKey(o => o.ShopId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
             // ── Category unique index ───────────────────────────────
             modelBuilder.Entity<Category>()
                 .HasIndex(c => c.Slug)
@@ -130,8 +140,6 @@ namespace PoiApi.Data
                     CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
                 }
             );
-
-
         }
     }
 }

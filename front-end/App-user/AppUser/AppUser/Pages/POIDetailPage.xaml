@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
     x:Class="AppUser.Pages.POIDetailPage"
+    x:Name="this"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:AppUser.ViewModels"
@@ -51,7 +52,8 @@
                             HorizontalOptions="End"
                             VerticalOptions="Start"
                             Margin="0,52,16,0"
-                            HeightRequest="40">
+                            HeightRequest="40"
+                            IsVisible="False">
                         <Button Text="{Binding CurrentLanguage, StringFormat='🌐 {0}'}"
                                 Command="{Binding ToggleLanguageAsyncCommand}"
                                 BackgroundColor="Transparent"
@@ -95,7 +97,7 @@
                                 StrokeShape="RoundRectangle 20"
                                 StrokeThickness="0"
                                 Padding="20,16"
-                                IsVisible="{Binding HasAudio}">
+                                IsVisible="True">
                             <Border.Shadow>
                                 <Shadow Brush="{StaticResource Primary}" Offset="0,10" Radius="20" Opacity="0.3"/>
                             </Border.Shadow>
@@ -226,7 +228,7 @@
         <!-- ── FLOATING PLAY BUTTON ── -->
         <Border StrokeShape="RoundRectangle 28"
                 StrokeThickness="0"
-                IsVisible="{Binding HasAudio}"
+                IsVisible="True"
                 HorizontalOptions="Fill"
                 VerticalOptions="End"
                 Margin="24,0,24,32"

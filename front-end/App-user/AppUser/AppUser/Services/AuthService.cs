@@ -51,12 +51,45 @@ namespace AppUser.Services
                         return (true, "Đăng nhập thành công");
                     }
                 }
-                
+                try
+                {
+                    var error = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                    if (error != null && error.ContainsKey("message"))
+                        return (false, error["message"]);
+                }
+                catch { }
+
                 return (false, "Email hoặc mật khẩu không đúng.");
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Login error: {ex.Message}");
+                return (false, "Không thể kết nối đến máy chủ.");
+            }
+        }
+
+        // Refresh user state from backend (important for admin block/disable).
+        public async Task<(bool Success, string? Message)> RefreshMeAsync()
+        {
+            if (_token == null) return (false, "Chưa đăng nhập.");
+
+            try
+            {
+                var response = await _httpClient.GetAsync("/api/auth/me");
+                if (!response.IsSuccessStatusCode)
+                {
+                    var msg = await response.Content.ReadAsStringAsync();
+                    return (false, !string.IsNullOrWhiteSpace(msg) ? msg : "Phiên đăng nhập không hợp lệ.");
+                }
+
+                var me = await response.Content.ReadFromJsonAsync<UserDto>();
+                if (me == null) return (false, "Dữ liệu người dùng không hợp lệ.");
+
+                _currentUser = me;
+                return (true, null);
+            }
+            catch
+            {
                 return (false, "Không thể kết nối đến máy chủ.");
             }
         }

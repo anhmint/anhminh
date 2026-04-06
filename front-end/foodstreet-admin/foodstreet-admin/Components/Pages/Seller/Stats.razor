@@ -9,19 +9,24 @@
 
 <PageTitle>Thống kê</PageTitle>
 
-<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4">
-    <MudText Typo="Typo.h4">📈 Thống kê gian hàng</MudText>
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-6 animate-fade-in-up">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4" Style="font-weight:800" Class="gradient-text">📈 Thống kê gian hàng</MudText>
+        <MudText Typo="Typo.body2" Style="opacity:0.6">Báo cáo doanh thu & hiệu suất</MudText>
+    </MudStack>
     <MudSpacer />
     <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.PictureAsPdf"
-               Color="Color.Error" Size="Size.Small" Class="mr-2">Export PDF</MudButton>
+               Color="Color.Error" Size="Size.Small" Class="mr-2"
+               Style="border-radius:12px">Export PDF</MudButton>
     <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.TableChart"
-               Color="Color.Success" Size="Size.Small">Export Excel</MudButton>
+               Color="Color.Success" Size="Size.Small"
+               Style="border-radius:12px">Export Excel</MudButton>
 </MudStack>
 
-<MudPaper Class="pa-3 mb-4" Elevation="1">
+<MudPaper Class="pa-3 mb-4 glass-card animate-fade-in-up" Elevation="0">
     <MudGrid AlignItems="AlignItems.Center">
-        <MudItem xs="12" md="4">
-            <MudSelect @bind-Value="selectedStoreId" Label="Chọn gian hàng" Variant="Variant.Outlined" Dense="true">
+        <MudItem xs="12" md="3">
+            <MudSelect @bind-Value="selectedStoreId" @bind-Value:after="LoadAllData" Label="Chọn gian hàng" Variant="Variant.Outlined" Dense="true">
                 <MudSelectItem Value="0">Tất cả gian hàng</MudSelectItem>
                 @foreach (var store in myStores)
                 {
@@ -29,41 +34,58 @@
                 }
             </MudSelect>
         </MudItem>
-        <MudItem xs="12" md="4">
-            <MudSelect @bind-Value="selectedPeriod" Label="Khoảng thời gian" Variant="Variant.Outlined" Dense="true">
+        <MudItem xs="12" md="3">
+            <MudSelect @bind-Value="selectedPeriod" @bind-Value:after="LoadAllData" Label="Khoảng thời gian" Variant="Variant.Outlined" Dense="true">
                 <MudSelectItem Value="@("week")">7 ngày qua</MudSelectItem>
                 <MudSelectItem Value="@("month")">Tháng này</MudSelectItem>
                 <MudSelectItem Value="@("quarter")">Quý này</MudSelectItem>
                 <MudSelectItem Value="@("year")">Năm nay</MudSelectItem>
             </MudSelect>
         </MudItem>
+        <MudItem xs="12" md="3">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                <MudIconButton Icon="@Icons.Material.Filled.ChevronLeft" Color="Color.Primary"
+                               OnClick="PreviousWeek" Title="Tuần trước" />
+                <MudText Typo="Typo.body2" Style="font-weight:600; white-space:nowrap">
+                    @weekStartDisplay — @weekEndDisplay
+                </MudText>
+                <MudIconButton Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Primary"
+                               OnClick="NextWeek" Title="Tuần sau" />
+                <MudIconButton Icon="@Icons.Material.Filled.Today" Color="Color.Secondary"
+                               OnClick="GoToCurrentWeek" Title="Tuần này" />
+            </MudStack>
+        </MudItem>
+        <MudItem xs="12" md="3">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh"
+                       OnClick="LoadAllData" FullWidth="true" Style="border-radius:12px; box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3)">Làm mới</MudButton>
+        </MudItem>
     </MudGrid>
 </MudPaper>
 
 <MudGrid Class="mb-4">
     <MudItem xs="6" md="3">
-        <MudPaper Class="pa-4 text-center" Elevation="2">
+        <MudPaper Class="pa-4 text-center glass-card animate-fade-in-up delay-1" Elevation="0">
+            <MudIcon Icon="@Icons.Material.Filled.AttachMoney" Color="Color.Warning" Size="Size.Large" />
+            <MudText Typo="Typo.h4" Color="Color.Warning"><b>@weeklyRevenue.ToString("N0")</b></MudText>
+            <MudText Typo="Typo.body2">Doanh thu tuần (VNĐ)</MudText>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="6" md="3">
+        <MudPaper Class="pa-4 text-center glass-card animate-fade-in-up delay-1" Elevation="0">
             <MudIcon Icon="@Icons.Material.Filled.Headphones" Color="Color.Primary" Size="Size.Large" />
             <MudText Typo="Typo.h4" Color="Color.Primary"><b>@totalListens.ToString("N0")</b></MudText>
             <MudText Typo="Typo.body2">Lượt nghe audio</MudText>
         </MudPaper>
     </MudItem>
     <MudItem xs="6" md="3">
-        <MudPaper Class="pa-4 text-center" Elevation="2">
+        <MudPaper Class="pa-4 text-center glass-card animate-fade-in-up delay-1" Elevation="0">
             <MudIcon Icon="@Icons.Material.Filled.Visibility" Color="Color.Success" Size="Size.Large" />
             <MudText Typo="Typo.h4" Color="Color.Success"><b>@totalViews.ToString("N0")</b></MudText>
             <MudText Typo="Typo.body2">Lượt xem gian hàng</MudText>
         </MudPaper>
     </MudItem>
     <MudItem xs="6" md="3">
-        <MudPaper Class="pa-4 text-center" Elevation="2">
-            <MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Warning" Size="Size.Large" />
-            <MudText Typo="Typo.h4" Color="Color.Warning"><b>@averageRating.ToString("F1")</b></MudText>
-            <MudText Typo="Typo.body2">Điểm đánh giá TB</MudText>
-        </MudPaper>
-    </MudItem>
-    <MudItem xs="6" md="3">
-        <MudPaper Class="pa-4 text-center" Elevation="2">
+        <MudPaper Class="pa-4 text-center glass-card animate-fade-in-up delay-1" Elevation="0">
             <MudIcon Icon="@Icons.Material.Filled.RateReview" Color="Color.Secondary" Size="Size.Large" />
             <MudText Typo="Typo.h4" Color="Color.Secondary"><b>@totalReviews.ToString("N0")</b></MudText>
             <MudText Typo="Typo.body2">Tổng review</MudText>
@@ -71,9 +93,102 @@
     </MudItem>
 </MudGrid>
 
+@if (isLoadingRevenue)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mb-4" />
+}
+
 <MudGrid>
+    <!-- Daily Revenue (Week) -->
     <MudItem xs="12" md="7">
-        <MudPaper Class="pa-4" Elevation="2">
+        <MudPaper Class="pa-4 glass-card animate-fade-in-up delay-2" Elevation="0">
+            <MudText Typo="Typo.h6" Class="mb-3">💰 Doanh thu theo ngày trong tuần</MudText>
+            <MudTable Items="@dailyRevenue" Hover="true" Dense="true" Striped="true">
+                <HeaderContent>
+                    <MudTh>Ngày</MudTh>
+                    <MudTh>Thứ</MudTh>
+                    <MudTh>Đơn hàng</MudTh>
+                    <MudTh>Doanh thu (VNĐ)</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Date</MudTd>
+                    <MudTd><MudText Style="font-weight:600">@context.DayName</MudText></MudTd>
+                    <MudTd>@context.OrderCount</MudTd>
+                    <MudTd>
+                        @if (dailyRevenue.Any() && dailyRevenue.Max(d => d.Revenue) > 0)
+                        {
+                            <MudProgressLinear Value="@((double)(context.Revenue / dailyRevenue.Max(d => d.Revenue)) * 100)"
+                                               Color="Color.Success" Rounded="true" Class="my-1" />
+                        }
+                        <MudText Typo="Typo.caption" Style="font-weight:600; color: #10b981">
+                            @context.Revenue.ToString("N0") đ
+                        </MudText>
+                    </MudTd>
+                </RowTemplate>
+                <NoRecordsContent>
+                    <MudText>Chưa có dữ liệu doanh thu tuần này.</MudText>
+                </NoRecordsContent>
+            </MudTable>
+        </MudPaper>
+    </MudItem>
+
+    <!-- Revenue by Shop -->
+    <MudItem xs="12" md="5">
+        <MudPaper Class="pa-4 glass-card animate-fade-in-up delay-3" Elevation="0">
+            <MudText Typo="Typo.h6" Class="mb-3">🏪 Doanh thu theo cửa hàng</MudText>
+            @if (shopRevenue.Any())
+            {
+                @foreach (var shop in shopRevenue)
+                {
+                    <MudPaper Class="pa-3 mb-2" Elevation="0" Style="background:rgba(255,255,255,0.5); border:1px solid rgba(255,255,255,0.6); border-radius:12px;">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-1">
+                            <MudAvatar Size="Size.Small" Color="Color.Primary">@shop.ShopName[0]</MudAvatar>
+                            <MudText Typo="Typo.body2"><b>@shop.ShopName</b></MudText>
+                            <MudSpacer />
+                            <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Text">
+                                @shop.OrderCount đơn
+                            </MudChip>
+                        </MudStack>
+                        <MudText Typo="Typo.h6" Color="Color.Warning" Style="font-weight:700">
+                            @shop.Revenue.ToString("N0") đ
+                        </MudText>
+                    </MudPaper>
+                }
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Info" Variant="Variant.Text" Dense="true">
+                    Chưa có doanh thu trong tuần này.
+                </MudAlert>
+            }
+        </MudPaper>
+
+        <!-- Recent Reviews (kept from original) -->
+        <MudPaper Class="pa-4 mt-4 glass-card animate-fade-in-up delay-3" Elevation="0">
+            <MudText Typo="Typo.h6" Class="mb-3">⭐ Đánh giá gần đây</MudText>
+            @foreach (var review in recentReviews)
+            {
+                <MudPaper Class="pa-3 mb-2" Elevation="0" Style="background:rgba(255,255,255,0.5); border:1px solid rgba(255,255,255,0.6); border-radius:12px;">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-1">
+                        <MudAvatar Size="Size.Small" Color="Color.Secondary">@review.CustomerName[0]</MudAvatar>
+                        <MudText Typo="Typo.body2"><b>@review.CustomerName</b></MudText>
+                        <MudSpacer />
+                        <MudRating ReadOnly="true" SelectedValue="@review.Rating" Size="Size.Small" />
+                    </MudStack>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">@review.Comment</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Tertiary">@review.CreatedAt.ToString("dd/MM/yyyy")</MudText>
+                </MudPaper>
+            }
+            @if (!recentReviews.Any())
+            {
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Chưa có đánh giá nào.</MudText>
+            }
+        </MudPaper>
+    </MudItem>
+
+    <!-- Monthly Details (kept from original) -->
+    <MudItem xs="12">
+        <MudPaper Class="pa-4 glass-card animate-fade-in-up delay-4" Elevation="0">
             <MudText Typo="Typo.h6" Class="mb-3">📊 Chi tiết theo tháng</MudText>
             <MudTable Items="@monthlyStats" Hover="true" Dense="true" Striped="true">
                 <HeaderContent>
@@ -94,44 +209,32 @@
             </MudTable>
         </MudPaper>
     </MudItem>
-
-    <MudItem xs="12" md="5">
-        <MudPaper Class="pa-4" Elevation="2">
-            <MudText Typo="Typo.h6" Class="mb-3">⭐ Đánh giá gần đây</MudText>
-            @foreach (var review in recentReviews)
-            {
-                <MudPaper Class="pa-3 mb-2" Elevation="1" Style="background:#f9f9f9">
-                    <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-1">
-                        <MudAvatar Size="Size.Small" Color="Color.Secondary">@review.CustomerName[0]</MudAvatar>
-                        <MudText Typo="Typo.body2"><b>@review.CustomerName</b></MudText>
-                        <MudSpacer />
-                        <MudRating ReadOnly="true" SelectedValue="@review.Rating" Size="Size.Small" />
-                    </MudStack>
-                    <MudText Typo="Typo.body2" Color="Color.Secondary">@review.Comment</MudText>
-                    <MudText Typo="Typo.caption" Color="Color.Tertiary">@review.CreatedAt.ToString("dd/MM/yyyy")</MudText>
-                </MudPaper>
-            }
-            @if (!recentReviews.Any())
-            {
-                <MudText Typo="Typo.body2" Color="Color.Secondary">Chưa có đánh giá nào.</MudText>
-            }
-        </MudPaper>
-    </MudItem>
 </MudGrid>
 
 @code {
     [Parameter] public int StoreId { get; set; }
 
     private int selectedStoreId = 0;
-    private string selectedPeriod = "month";
+    private string selectedPeriod = "week";
     private int currentSellerId = 0;
+    private bool isLoadingRevenue = false;
 
-    // Các biến chứa dữ liệu thật
+    // Week navigation
+    private DateTime currentWeekDate = DateTime.UtcNow;
+    private string weekStartDisplay = "";
+    private string weekEndDisplay = "";
+
+    // Revenue data
+    private decimal weeklyRevenue = 0;
+    private List<foodstreet_admin.Models.DailyRevenueItem> dailyRevenue = new();
+    private List<foodstreet_admin.Models.ShopRevenueItem> shopRevenue = new();
+
+    // Existing stats data
     private List<foodstreet_admin.Models.StoreModel> myStores = new();
     private List<foodstreet_admin.Models.StatModel> monthlyStats = new();
     private List<foodstreet_admin.Models.ReviewModel> recentReviews = new();
-    
-    // Các biến hiển thị trên Summary Cards
+
+    // Summary cards
     private int totalListens = 0;
     private int totalViews = 0;
     private double averageRating = 0;
@@ -139,7 +242,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // 1. Lấy ID người dùng hiện tại
+        // 1. Get current user ID
         var authState = await AuthState.GetAuthenticationStateAsync();
         var user = authState.User;
 
@@ -152,17 +255,81 @@
             }
         }
 
-        // 2. Lấy danh sách gian hàng để bỏ vào cái Dropdown
+        await LoadAllData();
+    }
+
+    private async Task LoadAllData()
+    {
+        // Load stores
         myStores = await StoreSvc.GetStoresAsync(currentSellerId);
 
-        // 3. Lấy số liệu thống kê & Review
-        monthlyStats = await StoreSvc.GetSellerStatsAsync(currentSellerId);
-        recentReviews = await StoreSvc.GetStoreReviewsAsync(selectedStoreId);
+        // Load general stats & reviews
+        monthlyStats = await StoreSvc.GetSellerStatsAsync(currentSellerId, selectedStoreId);
+        recentReviews = await StoreSvc.GetStoreReviewsAsync(selectedStoreId, currentSellerId);
 
-        // 4. Tính toán tổng số (Tạm thời bằng 0 hết vì list rỗng)
+        // Calculate totals
         totalListens = monthlyStats.Sum(s => s.TotalListens);
         totalViews = monthlyStats.Sum(s => s.TotalViews);
         totalReviews = monthlyStats.Sum(s => s.TotalReviews);
+
+        // Load revenue
+        await LoadRevenueData();
+    }
+
+    private async Task LoadRevenueData()
+    {
+        isLoadingRevenue = true;
+        StateHasChanged();
+
+        var weekDateStr = currentWeekDate.ToString("yyyy-MM-dd");
+        var revenueData = await StoreSvc.GetSellerRevenueAsync(currentSellerId, weekDateStr, selectedStoreId);
+
+        if (revenueData != null)
+        {
+            weeklyRevenue = revenueData.TotalRevenue;
+            dailyRevenue = revenueData.DailyRevenue;
+            shopRevenue = revenueData.ShopRevenue;
+            weekStartDisplay = revenueData.WeekStart;
+            weekEndDisplay = revenueData.WeekEnd;
+        }
+        else
+        {
+            weeklyRevenue = 0;
+            dailyRevenue = new();
+            shopRevenue = new();
+            UpdateWeekDisplay();
+        }
+
+        isLoadingRevenue = false;
+        StateHasChanged();
+    }
+
+    private async Task PreviousWeek()
+    {
+        currentWeekDate = currentWeekDate.AddDays(-7);
+        await LoadRevenueData();
+    }
+
+    private async Task NextWeek()
+    {
+        currentWeekDate = currentWeekDate.AddDays(7);
+        await LoadRevenueData();
+    }
+
+    private async Task GoToCurrentWeek()
+    {
+        currentWeekDate = DateTime.UtcNow;
+        await LoadRevenueData();
+    }
+
+    private void UpdateWeekDisplay()
+    {
+        var dayOfWeek = currentWeekDate.DayOfWeek;
+        int daysToMonday = dayOfWeek == DayOfWeek.Sunday ? -6 : -(int)dayOfWeek + 1;
+        var weekStart = currentWeekDate.Date.AddDays(daysToMonday);
+        var weekEnd = weekStart.AddDays(6);
+        weekStartDisplay = weekStart.ToString("dd/MM");
+        weekEndDisplay = weekEnd.ToString("dd/MM");
     }
 
     protected override void OnParametersSet()
