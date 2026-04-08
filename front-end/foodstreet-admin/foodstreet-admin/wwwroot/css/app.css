@@ -15,10 +15,13 @@ html, body {
     height: 100%;
     margin: 0;
     color: #1E293B;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, .mud-typography-h1, .mud-typography-h2, .mud-typography-h3, .mud-typography-h4, .mud-typography-h5, .mud-typography-h6 {
-    font-family: 'Outfit', sans-serif !important;
+h1, h2, h3, h4, h5, h6, .mud-typography-h1, .mud-typography-h2, .mud-typography-h3, .mud-typography-h4, .mud-typography-h5, .mud-typography-h6 {
+    font-family: 'Inter', sans-serif !important;
+    letter-spacing: -0.025em;
 }
 
 /* Glassmorphism Classes */
@@ -48,6 +51,7 @@ h1, h2, h3, h4, .mud-typography-h1, .mud-typography-h2, .mud-typography-h3, .mud
 .gradient-text {
     background: var(--primary-gradient);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -69,11 +73,26 @@ h1, h2, h3, h4, .mud-typography-h1, .mud-typography-h2, .mud-typography-h3, .mud
     border-right: 1px solid var(--glass-border) !important;
 }
 
+.mud-nav-menu {
+    overflow-x: hidden !important;
+}
+
 .mud-nav-link {
-    border-radius: 12px !important;
-    margin: 4px 12px !important;
+    border-radius: 8px !important;
+    margin: 2px 8px !important;
+    width: auto !important;
+    padding: 6px 12px !important;
+    min-height: 38px !important;
+    font-size: 0.875rem;
     font-weight: 500;
     transition: all 0.2s ease !important;
+}
+
+.mud-nav-link .mud-nav-link-icon {
+    font-size: 1.25rem !important;
+    margin-right: 12px !important;
+    width: 20px;
+    height: 20px;
 }
 
 .mud-nav-link.active {
@@ -98,12 +117,19 @@ h1, h2, h3, h4, .mud-typography-h1, .mud-typography-h2, .mud-typography-h3, .mud
 .delay-4 { animation-delay: 0.4s; }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { 
-    background: #CBD5E1; 
-    border-radius: 10px;
-    border: 2px solid transparent;
-    background-clip: content-box;
+    background: rgba(148, 163, 184, 0.5); 
+    border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.8); }
+
+/* Make sure emojis and specific icons don't get transparent clipped by gradient */
+.gradient-text-safe {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}

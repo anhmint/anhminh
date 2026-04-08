@@ -7,6 +7,9 @@ namespace PoiApi.DTOs.Owner
         public string Address { get; set; } = string.Empty;
         public string? ImageUrl { get; set; }
         public string? MenuImagesUrl { get; set; }
+        // Seller sends category "Name" (v.d. "Ốc", "Hải sản") from UI.
+        // Backend will resolve (or create) a Category row.
+        public string? Category { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
     }

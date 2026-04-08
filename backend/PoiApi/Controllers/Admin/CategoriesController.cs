@@ -27,7 +27,7 @@ namespace PoiApi.Controllers.Admin
                     c.Name,
                     c.Slug,
                     c.IsActive,
-                    StoreCount = 0 // Future extension: count from Shops related to this Category
+                    StoreCount = _context.Shops.Count(s => s.CategoryId == c.Id)
                 })
                 .OrderBy(c => c.Name)
                 .ToList();

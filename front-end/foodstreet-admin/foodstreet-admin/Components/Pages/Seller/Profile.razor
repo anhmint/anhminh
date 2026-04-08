@@ -9,7 +9,7 @@
 
 <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-6 animate-fade-in-up">
     <MudStack Spacing="0">
-        <MudText Typo="Typo.h4" Style="font-weight:800" Class="gradient-text">👤 Cài đặt Profile</MudText>
+        <MudText Typo="Typo.h4" Style="font-weight:800">👤 <span class="gradient-text-safe">Cài đặt Profile</span></MudText>
         <MudText Typo="Typo.body2" Style="opacity:0.6">Quản lý thông tin cá nhân</MudText>
     </MudStack>
 </MudStack>
@@ -121,20 +121,28 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // 1. Lấy thông tin từ Cookie (Chỉ dùng để hiển thị ban đầu)
+        // Prefer fetching fresh profile from API (cookie claims may be stale after updates).
+        var (ok, me, _) = await AuthSvc.GetMeAsync();
+        if (ok && me != null)
+        {
+            _currentUserId = me.Id;
+            _name = me.FullName;
+            _email = me.Email;
+            _phone = me.Phone; // currently not persisted on backend; kept for future
+            return;
+        }
+
+        // Fallback: show from cookie claims (for initial render if API not reachable).
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-
         if (user.Identity?.IsAuthenticated == true)
         {
             _email = user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
-            _name  = user.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? _email;
-            
+            _name = user.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? _email;
+
             var idClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
             if (idClaim != null && int.TryParse(idClaim.Value, out int parsedId))
-            {
                 _currentUserId = parsedId;
-            }
         }
     }
 
@@ -150,6 +158,17 @@
         
         var (ok, msg) = await AuthSvc.UpdateProfileAsync(_currentUserId, _name, _email);
         Snackbar.Add(msg, ok ? Severity.Success : Severity.Error);
+
+        if (ok)
+        {
+            // Refresh UI with the latest data from backend
+            var (meOk, me, _) = await AuthSvc.GetMeAsync();
+            if (meOk && me != null)
+            {
+                _name = me.FullName;
+                _email = me.Email;
+            }
+        }
         
         _savingProfile = false;
     }

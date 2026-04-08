@@ -5,6 +5,8 @@ using PoiApi.Data;
 using PoiApi.DTOs.Owner;
 using PoiApi.Models;
 using PoiApi.Services;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Security.Claims;
 
 namespace PoiApi.Controllers.Owner
@@ -32,6 +34,64 @@ namespace PoiApi.Controllers.Owner
             return userId;
         }
 
+        private async Task<int?> ResolveOrCreateCategoryIdAsync(string? categoryValue)
+        {
+            if (string.IsNullOrWhiteSpace(categoryValue))
+                return null;
+
+            var input = categoryValue.Trim();
+            var lowerInput = input.ToLowerInvariant();
+
+            var existing = await _context.Categories
+                .FirstOrDefaultAsync(c =>
+                    c.Name.ToLower() == lowerInput || c.Slug.ToLower() == lowerInput);
+
+            if (existing != null)
+                return existing.Id;
+
+            // Auto-create category when seller uses a category name from UI.
+            var baseSlug = ToSlug(input);
+            var slug = baseSlug;
+            var i = 1;
+            while (await _context.Categories.AnyAsync(c => c.Slug == slug))
+            {
+                slug = $"{baseSlug}-{i++}";
+            }
+
+            var category = new Category
+            {
+                Name = input,
+                Slug = slug,
+                IsActive = true
+            };
+
+            _context.Categories.Add(category);
+            await _context.SaveChangesAsync();
+            return category.Id;
+        }
+
+        private static string ToSlug(string value)
+        {
+            // Normalize vietnamese diacritics -> base chars.
+            var normalized = value.Normalize(System.Text.NormalizationForm.FormD);
+            var stringBuilder = new System.Text.StringBuilder();
+            foreach (var ch in normalized)
+            {
+                var uc = CharUnicodeInfo.GetUnicodeCategory(ch);
+                if (uc != UnicodeCategory.NonSpacingMark)
+                    stringBuilder.Append(ch);
+            }
+
+            var ascii = stringBuilder.ToString().ToLowerInvariant();
+            // Replace spaces and separators with '-'
+            ascii = Regex.Replace(ascii, @"[\s_/]+", "-");
+            // Remove remaining non alphanumeric/hyphen
+            ascii = Regex.Replace(ascii, @"[^a-z0-9\-]+", "");
+            // Collapse multiple '-'
+            ascii = Regex.Replace(ascii, @"-+", "-").Trim('-');
+            return string.IsNullOrWhiteSpace(ascii) ? "category" : ascii;
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetMyShops()
         {
@@ -40,6 +100,7 @@ namespace PoiApi.Controllers.Owner
 
             var ownerId = GetCurrentUserId();
             var query = await _context.Shops
+                .Include(s => s.Category)
                 .Include(s => s.Poi)
                     .ThenInclude(p => p.Translations)
                 .Where(s => s.OwnerId == ownerId)
@@ -84,7 +145,7 @@ namespace PoiApi.Controllers.Owner
                     AudioUrls = s.Poi != null 
                                 ? s.Poi.Translations.Where(t => !string.IsNullOrEmpty(t.AudioUrl)).ToDictionary(t => t.LanguageCode, t => t.AudioUrl) 
                                 : new Dictionary<string, string>(),
-                    Category = "Mặc định",
+                    Category = s.Category != null ? s.Category.Name : "Mặc định",
                     Status = s.IsActive ? "Active" : "Pending",
                     SellerId = s.OwnerId,
                     s.CreatedAt,
@@ -100,6 +161,8 @@ namespace PoiApi.Controllers.Owner
         public async Task<IActionResult> CreateShop([FromBody] ShopCreateDto dto)
         {
             var ownerId = GetCurrentUserId();
+
+            var categoryId = await ResolveOrCreateCategoryIdAsync(dto.Category);
 
             // 1. Tạo POI tương ứng cho Shop
             var poi = new POI
@@ -130,6 +193,7 @@ namespace PoiApi.Controllers.Owner
                 Address = dto.Address,
                 OwnerId = ownerId,
                 PoiId = poi.Id,
+                CategoryId = categoryId,
                 IsActive = true // Mặc định cho phép hoạt động (Hoặc để Admin duyệt)
             };
 
@@ -144,6 +208,7 @@ namespace PoiApi.Controllers.Owner
         {
             var ownerId = GetCurrentUserId();
             var shop = await _context.Shops
+                .Include(s => s.Category)
                 .Include(s => s.Poi)
                     .ThenInclude(p => p.Translations)
                 .FirstOrDefaultAsync(s => s.Id == id && s.OwnerId == ownerId);
@@ -153,6 +218,7 @@ namespace PoiApi.Controllers.Owner
             shop.Name = dto.Name;
             shop.Description = dto.Description;
             shop.Address = dto.Address;
+            shop.CategoryId = await ResolveOrCreateCategoryIdAsync(dto.Category);
 
             if (shop.Poi != null)
             {
@@ -337,12 +403,13 @@ namespace PoiApi.Controllers.Owner
             // Step 3: Dịch nếu cần
             if (lang != "vi")
             {
-                var translatedName = await _translator.TranslateAsync(viName, lang);
-                var translatedDesc = await _translator.TranslateAsync(viDescription, lang);
-
-                // Chống trường hợp dịch thất bại trả về chính nó -> không update
-                if (!string.IsNullOrEmpty(translatedName)) translation.Name = translatedName;
-                if (!string.IsNullOrEmpty(translatedDesc)) translation.Description = translatedDesc;
+                // Translate both fields in one request to reduce latency.
+                var translated = await _translator.TranslateListAsync(new List<string> { viName, viDescription }, lang);
+                if (translated != null && translated.Count >= 2)
+                {
+                    if (!string.IsNullOrWhiteSpace(translated[0])) translation.Name = translated[0];
+                    if (!string.IsNullOrWhiteSpace(translated[1])) translation.Description = translated[1];
+                }
             }
 
             if (isNew) _context.POITranslations.Add(translation);

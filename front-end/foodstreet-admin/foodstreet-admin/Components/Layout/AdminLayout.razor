@@ -8,9 +8,9 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit"
                        Edge="Edge.Start" OnClick="ToggleDrawer" />
         <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="ml-1">
-            <MudIcon Icon="@Icons.Material.Filled.AdminPanelSettings" Class="gradient-text" Style="font-size: 1.5rem;" />
-            <MudText Typo="Typo.h6" Class="gradient-text" Style="font-weight:800; letter-spacing: -0.5px">
-                FoodStreet <span style="font-weight:300; color: #64748b">Admin</span>
+            <MudIcon Icon="@Icons.Material.Filled.AdminPanelSettings" Color="Color.Primary" Style="font-size: 1.5rem;" />
+            <MudText Typo="Typo.h6" Class="gradient-text-safe" Style="font-weight:800; letter-spacing: -0.5px; margin-left: 4px;">
+                FoodStreet <span style="font-weight:400; color: #64748b">Admin</span>
             </MudText>
         </MudStack>
         <MudSpacer />
@@ -40,17 +40,17 @@
         <div class="d-flex flex-column" style="height: 100%;">
             
             <div>
-                <MudDrawerHeader Style="padding:24px 16px">
+                <MudDrawerHeader Style="padding:12px 16px">
                     <MudStack Spacing="1" AlignItems="AlignItems.Center" Row="true" Class="w-100">
-                        <MudAvatar Color="Color.Warning" Size="Size.Large" Class="mud-elevation-4" 
+                        <MudAvatar Color="Color.Warning" Size="Size.Medium" Class="mud-elevation-2" 
                                    Style="background: var(--primary-gradient); color: white; font-weight: 700">
                             AD
                         </MudAvatar>
                         <MudStack Spacing="0" Class="ml-2">
-                            <MudText Typo="Typo.body1" Style="font-weight:700; color: #1e293b">
+                            <MudText Typo="Typo.body2" Style="font-weight:700; color: #1e293b">
                                 Quản trị viên
                             </MudText>
-                            <MudText Typo="Typo.caption" Style="color: #64748b; font-weight: 500">
+                            <MudText Typo="Typo.caption" Style="color: #64748b; font-weight: 500; line-height: 1">
                                 Super Administrator
                             </MudText>
                         </MudStack>
@@ -59,8 +59,8 @@
                 <MudDivider />
             </div>
 
-            <div class="flex-grow-1" style="overflow-y: auto;">
-                <MudNavMenu Class="pa-2">
+            <div class="flex-grow-1" style="overflow-y: auto; overflow-x: hidden;">
+                <MudNavMenu Class="pa-1">
                     <MudNavLink Href="/admin/dashboard" Match="NavLinkMatch.All"
                                 Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
 

@@ -48,7 +48,7 @@
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Spacing="8">
-                            <Label Text="Email (* @example.com)" FontFamily="PoppinsSemiBold" FontSize="14" TextColor="{StaticResource TextPrimary}" />
+                            <Label Text="Email" FontFamily="PoppinsSemiBold" FontSize="14" TextColor="{StaticResource TextPrimary}" />
                             <Border StrokeShape="RoundRectangle 12" Stroke="{StaticResource Border}" StrokeThickness="1" BackgroundColor="{StaticResource SurfaceVariant}" Padding="16,4">
                                 <Entry Text="{Binding Email}" FontFamily="PoppinsRegular" Placeholder="example@example.com" Keyboard="Email" BackgroundColor="Transparent" TextColor="{StaticResource TextPrimary}" />
                             </Border>

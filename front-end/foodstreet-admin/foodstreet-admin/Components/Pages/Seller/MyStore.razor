@@ -17,7 +17,7 @@
 
 <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-6 animate-fade-in-up">
     <MudStack Spacing="0">
-        <MudText Typo="Typo.h4" Style="font-weight:800" Class="gradient-text">🏪 @Lang.T("MyStore")</MudText>
+        <MudText Typo="Typo.h4" Style="font-weight:800">🏪 <span class="gradient-text-safe">@Lang.T("MyStore")</span></MudText>
         <MudText Typo="Typo.body2" Style="opacity:0.6">@Lang.T("StoreSettings")</MudText>
     </MudStack>
     <MudSpacer />
@@ -352,6 +352,24 @@
                                    OnClick="ResetTtsText">Đặt lại</MudButton>
                     </MudStack>
 
+                    @if (_generatingTtsAll)
+                    {
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mb-2">
+                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                                <MudText Typo="Typo.caption">
+                                    Đang tạo audio cho 3 ngôn ngữ... Quá trình này có thể mất 1-3 phút.
+                                </MudText>
+                            </MudStack>
+                        </MudAlert>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(_ttsAllLastStatus))
+                    {
+                        <MudAlert Severity="@_ttsAllLastSeverity" Variant="Variant.Outlined" Dense="true" Class="mb-2">
+                            @_ttsAllLastStatus
+                        </MudAlert>
+                    }
+
                     @if (!string.IsNullOrEmpty(_form.AudioUrl))
                     {
                         <MudPaper Class="pa-3 mt-1" Elevation="0" Style="background:rgba(76,175,80,0.08);border-radius:10px;border:1px solid rgba(76,175,80,0.2)">
@@ -575,6 +593,8 @@
     }
 
     private bool _generatingTts, _generatingTtsAll, _isUploadingProfile, _isUploadingMenu;
+    private string _ttsAllLastStatus = "";
+    private Severity _ttsAllLastSeverity = Severity.Info;
 
     private async Task HandleProfileUpload(InputFileChangeEventArgs e)
     {
@@ -768,11 +788,15 @@
     {
         if (_editing == null || string.IsNullOrWhiteSpace(_form.Description)) return;
         _generatingTtsAll = true;
+        _ttsAllLastStatus = "";
+        _ttsAllLastSeverity = Severity.Info;
         StateHasChanged();
         
         try
         {
-            var result = await StoreSvc.GenerateTTSAllLanguagesAsync(_editing.Id, _form.Description);
+            // Always send the original Vietnamese text to backend (Azure Translator is configured from=vi).
+            var viText = string.IsNullOrWhiteSpace(_viDescription) ? _form.Description : _viDescription;
+            var result = await StoreSvc.GenerateTTSAllLanguagesAsync(_editing.Id, viText);
             
             if (result.ValueKind != JsonValueKind.Undefined && result.TryGetProperty("results", out var resultsProp))
             {
@@ -780,15 +804,25 @@
                 int failCount = 0;
                 var details = new List<string>();
                 
+                if (_editing.AudioUrls == null) _editing.AudioUrls = new Dictionary<string, string>();
                 foreach (var item in resultsProp.EnumerateArray())
                 {
                     var success = item.TryGetProperty("success", out var successPropItem) && successPropItem.GetBoolean();
                     var langName = item.TryGetProperty("languageName", out var langNameProp) ? langNameProp.GetString() : "";
+                    var langCode = item.TryGetProperty("language", out var langCodeProp) ? langCodeProp.GetString() : "";
                     
                     if (success)
                     {
                         successCount++;
                         details.Add($"✅ {langName}");
+                        if (item.TryGetProperty("audioUrl", out var audioUrlProp))
+                        {
+                            var aUrl = audioUrlProp.GetString();
+                            if (!string.IsNullOrEmpty(aUrl) && !string.IsNullOrEmpty(langCode))
+                            {
+                                _editing.AudioUrls[langCode] = aUrl;
+                            }
+                        }
                     }
                     else
                     {
@@ -814,18 +848,27 @@
                     : $"Kết quả: {successCount} thành công, {failCount} thất bại ({string.Join(", ", details)})";
                 
                 Snackbar.Add(summaryMsg, failCount == 0 ? Severity.Success : Severity.Warning);
+                _ttsAllLastStatus = summaryMsg;
+                _ttsAllLastSeverity = failCount == 0 ? Severity.Success : Severity.Warning;
             }
             else
             {
-                Snackbar.Add("Lỗi khi tạo TTS đa ngôn ngữ. Vui lòng kiểm tra lại cấu hình Azure.", Severity.Error);
+                const string message = "Lỗi khi tạo TTS đa ngôn ngữ. Vui lòng kiểm tra lại cấu hình Azure.";
+                Snackbar.Add(message, Severity.Error);
+                _ttsAllLastStatus = message;
+                _ttsAllLastSeverity = Severity.Error;
             }
         }
         catch (Exception ex)
         {
-            Snackbar.Add($"Lỗi: {ex.Message}", Severity.Error);
+            var message = $"Lỗi: {ex.Message}";
+            Snackbar.Add(message, Severity.Error);
+            _ttsAllLastStatus = message;
+            _ttsAllLastSeverity = Severity.Error;
         }
         
         _generatingTtsAll = false;
+        StateHasChanged();
     }
 
     private void CloseDialog() { _showDialog = false; }

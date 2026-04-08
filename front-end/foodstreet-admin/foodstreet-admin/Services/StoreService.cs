@@ -57,6 +57,7 @@ public class StoreService
                 address = store.Address,
                 imageUrl = store.ImageUrl,
                 menuImagesUrl = store.MenuImagesUrl,
+                category = string.IsNullOrWhiteSpace(store.Category) || store.Category == "Mặc định" ? null : store.Category,
                 latitude = store.Latitude,
                 longitude = store.Longitude
             });
@@ -85,6 +86,7 @@ public class StoreService
                 address = store.Address,
                 imageUrl = store.ImageUrl,
                 menuImagesUrl = store.MenuImagesUrl,
+                category = string.IsNullOrWhiteSpace(store.Category) || store.Category == "Mặc định" ? null : store.Category,
                 latitude = store.Latitude,
                 longitude = store.Longitude
             });
@@ -104,12 +106,18 @@ public class StoreService
 
     public async Task<JsonElement> GenerateTTSAsync(int storeId, string langCode = "vi")
     {
-        return await _api.PostAsync<object, JsonElement>($"owner/shops/{storeId}/generate-tts", new { langCode });
+        return await _api.PostAsync<object, JsonElement>(
+            $"owner/shops/{storeId}/generate-tts",
+            new { langCode },
+            TimeSpan.FromMinutes(2));
     }
 
     public async Task<JsonElement> GenerateTTSWithTextAsync(int storeId, string text, string langCode = "vi")
     {
-        return await _api.PostAsync<object, JsonElement>($"owner/shops/{storeId}/generate-tts", new { text, langCode });
+        return await _api.PostAsync<object, JsonElement>(
+            $"owner/shops/{storeId}/generate-tts",
+            new { text, langCode },
+            TimeSpan.FromMinutes(2));
     }
 
     /// <summary>
@@ -117,7 +125,10 @@ public class StoreService
     /// </summary>
     public async Task<JsonElement> GenerateTTSAllLanguagesAsync(int storeId, string? text = null)
     {
-        return await _api.PostAsync<object, JsonElement>($"owner/shops/{storeId}/generate-tts-all", new { text });
+        return await _api.PostAsync<object, JsonElement>(
+            $"owner/shops/{storeId}/generate-tts-all",
+            new { text },
+            TimeSpan.FromMinutes(4));
     }
 
     public async Task<string?> TranslateTextAsync(string text, string targetLang)

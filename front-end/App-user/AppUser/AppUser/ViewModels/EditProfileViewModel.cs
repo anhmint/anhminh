@@ -51,9 +51,11 @@ namespace AppUser.ViewModels
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(Email) || !Regex.IsMatch(Email, @"^[\w-\.]+@example\.com$"))
+            Email = Email?.Trim() ?? string.Empty;
+            // Accept any valid email format (do not restrict to @example.com)
+            if (string.IsNullOrWhiteSpace(Email) || !Regex.IsMatch(Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
             {
-                ErrorMessage = "Email không hợp lệ. Bắt buộc phải có đuôi @example.com";
+                ErrorMessage = "Email không hợp lệ.";
                 return;
             }
 

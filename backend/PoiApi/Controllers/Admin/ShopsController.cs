@@ -24,6 +24,7 @@ namespace PoiApi.Controllers.Admin
         {
             var query = _context.Shops
                 .Include(s => s.Owner)
+                .Include(s => s.Category)
                 .Include(s => s.Poi)
                     .ThenInclude(p => p.Translations)
                 .AsQueryable();
@@ -44,7 +45,7 @@ namespace PoiApi.Controllers.Admin
                     Phone = "", // Add as needed if User table eventually gets Phone
                     ImageUrl = s.Poi != null ? s.Poi.ImageUrl : "",
                     AudioUrl = "", // Schema does not have AudioUrl yet
-                    Category = "Mặc định", // Có thể mở rộng sau nếu có Category thực
+                    Category = s.Category != null ? s.Category.Name : "Mặc định",
                     Status = s.IsActive ? "Active" : "Pending", // Tạm dùng IsActive
                     SellerId = s.OwnerId,
                     SellerName = s.Owner.FullName,

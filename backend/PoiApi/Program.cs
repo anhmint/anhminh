@@ -65,6 +65,8 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // BUILD APP
 var app = builder.Build();
+
+app.UseCors("AllowFrontend");
 app.UseStaticFiles();
 
 // MIDDLEWARE
@@ -85,9 +87,6 @@ using (var scope = app.Services.CreateScope())
         context.Roles.Add(new Role { Name = "OWNER" });
     context.SaveChanges();
 }
-
-// ← ADD THIS: must be BEFORE UseAuthentication
-app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 // Enforce IsActive for all authenticated requests (prevents blocked users from keeping old JWTs)

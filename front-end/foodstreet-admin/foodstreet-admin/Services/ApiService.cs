@@ -97,6 +97,39 @@
             }
         }
 
+        public async Task<TResponse?> PostAsync<TRequest, TResponse>(string endpoint, TRequest data, TimeSpan timeout)
+        {
+            try
+            {
+                await ApplyHeadersAsync();
+                using var cts = new CancellationTokenSource(timeout);
+                var response = await _http.PostAsJsonAsync(endpoint, data, cts.Token);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorBody = await response.Content.ReadAsStringAsync();
+                    _logger.LogWarning("POST {Endpoint} returned {StatusCode}: {ErrorBody}", endpoint, response.StatusCode, errorBody);
+                    throw new HttpRequestException(errorBody, null, response.StatusCode);
+                }
+
+                return await response.Content.ReadFromJsonAsync<TResponse>(_jsonOptions);
+            }
+            catch (TaskCanceledException ex)
+            {
+                _logger.LogError(ex, "POST {Endpoint} timed out after {Timeout}s", endpoint, timeout.TotalSeconds);
+                return default;
+            }
+            catch (HttpRequestException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "POST {Endpoint} failed", endpoint);
+                return default;
+            }
+        }
+
         public async Task<TResponse?> PostMultipartAsync<TResponse>(string endpoint, Stream fileStream, string fileName)
         {
             try

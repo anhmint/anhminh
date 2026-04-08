@@ -5,6 +5,7 @@ namespace PoiApi.Services;
 
 public class AzureSpeechService
 {
+    private static readonly TimeSpan TtsTimeout = TimeSpan.FromSeconds(45);
     private readonly string _key;
     private readonly string _region;
     private readonly IWebHostEnvironment _env;
@@ -55,18 +56,46 @@ public class AzureSpeechService
             var fileName = $"poi_{poiId}_{langCode}_{Guid.NewGuid().ToString("N")[..8]}.mp3";
             var filePath = Path.Combine(audioDir, fileName);
 
-            using var audioConfig = AudioConfig.FromWavFileOutput(filePath);
-            using var synthesizer = new SpeechSynthesizer(speechConfig, audioConfig);
+            // Do NOT use PullAudioOutputStream as its Read() method blocks synchronously and can hang forever.
+            // By passing null for AudioConfig, the synthesized audio will be downloaded into result.AudioData asynchronously.
+            using var synthesizer = new SpeechSynthesizer(speechConfig, null);
 
-            var result = await synthesizer.SpeakTextAsync(text);
+            var speakTask = synthesizer.SpeakTextAsync(text);
+            var completed = await Task.WhenAny(speakTask, Task.Delay(TtsTimeout));
+            if (completed != speakTask)
+            {
+                _logger.LogError("TTS timed out after {Timeout}s for poi {PoiId} lang {Lang}",
+                    TtsTimeout.TotalSeconds, poiId, langCode);
+                return null;
+            }
+
+            var result = await speakTask;
 
             if (result.Reason == ResultReason.SynthesizingAudioCompleted)
             {
-                _logger.LogInformation("Audio generated: {File}", fileName);
-                return $"/audio/{fileName}";
+                if (result.AudioData != null && result.AudioData.Length > 0)
+                {
+                    await File.WriteAllBytesAsync(filePath, result.AudioData);
+                    _logger.LogInformation("Audio generated: {File} ({Size} bytes)", fileName, result.AudioData.Length);
+                    return $"/audio/{fileName}";
+                }
+                else
+                {
+                    _logger.LogError("TTS succeeded but AudioData was empty.");
+                    return null;
+                }
             }
 
-            _logger.LogError("TTS failed: {Reason}", result.Reason);
+            if (result.Reason == ResultReason.Canceled)
+            {
+                var details = SpeechSynthesisCancellationDetails.FromResult(result);
+                _logger.LogError("TTS canceled: {Reason} {ErrorCode} {ErrorDetails}",
+                    details.Reason, details.ErrorCode, details.ErrorDetails);
+            }
+            else
+            {
+                _logger.LogError("TTS failed: {Reason}", result.Reason);
+            }
             return null;
         }
         catch (Exception ex)

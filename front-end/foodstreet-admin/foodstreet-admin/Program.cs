@@ -45,7 +45,8 @@ builder.Services.AddHttpClient("API", client =>
     client.BaseAddress = new Uri(
         builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5279/api/");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
-    client.Timeout = TimeSpan.FromSeconds(30);
+    // TTS/translate operations can take longer when generating multiple languages.
+    client.Timeout = TimeSpan.FromMinutes(5);
 });
 
 builder.Services.AddHttpClient("Self", client =>

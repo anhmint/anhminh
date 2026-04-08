@@ -5,6 +5,7 @@ namespace PoiApi.Services;
 
 public class AzureTranslationService
 {
+    private static readonly TimeSpan TranslationTimeout = TimeSpan.FromSeconds(20);
     private readonly IConfiguration _config;
     private readonly HttpClient _httpClient;
     private readonly ILogger<AzureTranslationService> _logger;
@@ -82,7 +83,8 @@ public class AzureTranslationService
                 request.Headers.Add("Ocp-Apim-Subscription-Region", region);
             }
 
-            var response = await _httpClient.SendAsync(request);
+            using var cts = new CancellationTokenSource(TranslationTimeout);
+            var response = await _httpClient.SendAsync(request, cts.Token);
             
             if (!response.IsSuccessStatusCode)
             {
@@ -116,6 +118,12 @@ public class AzureTranslationService
             }
 
             return results;
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "AzureTranslationService timeout after {Timeout}s for {Lang}",
+                TranslationTimeout.TotalSeconds, targetLang);
+            return null;
         }
         catch (Exception ex)
         {

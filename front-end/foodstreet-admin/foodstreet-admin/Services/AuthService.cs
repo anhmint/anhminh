@@ -119,6 +119,33 @@ public class AuthService
             await ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     }
 
+    public async Task<(bool Success, UserModel? User, string Message)> GetMeAsync()
+    {
+        try
+        {
+            var me = await _api.GetAsync<MeResponse>("auth/me");
+            if (me == null)
+                return (false, null, "Không thể tải thông tin tài khoản.");
+
+            var user = new UserModel
+            {
+                Id = me.Id,
+                Email = me.Email ?? "",
+                FullName = me.FullName ?? "",
+                Role = me.Role ?? "",
+                Status = me.IsActive ? "Active" : "Disabled",
+                CreatedAt = me.CreatedAt
+            };
+
+            return (true, user, "OK");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "GetMeAsync failed");
+            return (false, null, "Lỗi khi tải thông tin tài khoản.");
+        }
+    }
+
     public async Task<(bool Success, string Message)> UpdateProfileAsync(int userId, string fullName, string email)
     {
         try
@@ -156,6 +183,16 @@ public class AuthService
             return (false, "Lỗi server khi đổi mật khẩu.");
         }
     }
+}
+
+internal class MeResponse
+{
+    public int Id { get; set; }
+    public string? Email { get; set; }
+    public string? FullName { get; set; }
+    public string? Role { get; set; }
+    public bool IsActive { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
 public class PendingLoginService
 {

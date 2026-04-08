@@ -10,6 +10,8 @@ namespace PoiApi.Models
         public User Owner { get; set; } = null!;
         public int? PoiId { get; set; }
         public POI? Poi { get; set; }
+        public int? CategoryId { get; set; }
+        public Category? Category { get; set; }
         public ICollection<Menu>? Menus { get; set; }
         public bool IsActive { get; set; } = true;
         public int ViewCount { get; set; } = 0;

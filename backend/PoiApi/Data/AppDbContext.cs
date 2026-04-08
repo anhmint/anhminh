@@ -62,6 +62,13 @@ namespace PoiApi.Data
                 .HasForeignKey(s => s.OwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // ── Shop <-> Category (optional) ─────────────────────────
+            modelBuilder.Entity<Shop>()
+                .HasOne(s => s.Category)
+                .WithMany()
+                .HasForeignKey(s => s.CategoryId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             // ── ServicePackage ──────────────────────────────────────
             modelBuilder.Entity<Subscription>()
                 .HasOne(s => s.User)
